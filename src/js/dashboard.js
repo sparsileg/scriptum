@@ -1,6 +1,6 @@
 // functions that create and display the dashboard
 
-function renderDashboard() {
+async function renderDashboard() {
     // Calculate stats
     const totalBooks = books.length;
     const totalPages = books.reduce((sum, book) => sum + (parseInt(book.Pages) || 0), 0);
@@ -12,7 +12,7 @@ function renderDashboard() {
     });
     const thisYearBooksCount = thisYearBooks.length;
     const thisYearPages = thisYearBooks.reduce((sum, book) => sum + (parseInt(book.Pages) || 0), 0);
-    
+
     // Calculate average pages per day for this year
     const now = new Date();
     const startOfYear = new Date(currentYear, 0, 1);
@@ -27,14 +27,14 @@ function renderDashboard() {
     document.getElementById('dashAvgPagesDay').textContent = avgPagesDay.toLocaleString();
 
     // Try to load saved order first
-    const orderLoaded = loadDashboardOrder();
-    
+    const orderLoaded = await loadDashboardOrder();
+
     // ALWAYS render the dynamic content, regardless of saved order
     renderRecentBooks();
     renderReadingGoals();
     renderWhatsNext();
     renderLibraryStats();
-    
+
     // Re-render charts and enable drag-drop after content is loaded
     setTimeout(() => {
         const dailyGoal = parseInt(localStorage.getItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES)) || null;
@@ -51,7 +51,7 @@ function renderDashboard() {
 
 function renderRecentBooks() {
     const recentBooksContainer = document.getElementById('recentBooks');
-    
+
     // Get books with dates, sort by most recent, take top 5
     const recentBooks = books
           .filter(book => book[CONSTANTS.BOOK_FIELDS.FINISHED])
@@ -73,7 +73,7 @@ function renderRecentBooks() {
             <div class="recent-book-author">by ${book[CONSTANTS.BOOK_FIELDS.AUTHOR]}</div>
         </div>
     `).join('');
-    
+
     recentBooksContainer.innerHTML = html;
 }
 
@@ -81,7 +81,7 @@ function renderRecentBooks() {
 function renderReadingGoals() {
     const goalDisplay = document.getElementById('goalDisplay');
     const dailyGoal = parseInt(localStorage.getItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES)) || null;
-    
+
     if (!dailyGoal) {
         goalDisplay.innerHTML = '<p class="goal-placeholder">Set a daily reading goal in Settings to track progress</p>';
         // Clear any existing chart
@@ -91,7 +91,7 @@ function renderReadingGoals() {
         }
         return;
     }
-    
+
     goalDisplay.innerHTML = `<p class="goal-current">Daily Goal: ${dailyGoal} pages</p>`;
     renderReadingGoalChart(dailyGoal);
 }
@@ -100,7 +100,7 @@ function renderReadingGoals() {
 function renderReadingGoalChart(dailyGoal) {
     const ctx = document.getElementById('readingGoalChart').getContext('2d');
     const colors = getThemeColors();
-    
+
     // Calculate current progress
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -108,7 +108,7 @@ function renderReadingGoalChart(dailyGoal) {
     const endOfYear = new Date(currentYear, 11, 31);
     const daysSinceStart = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
     const totalDaysInYear = Math.floor((endOfYear - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
-    
+
     // Get actual pages read this year
     const thisYearBooks = books.filter(book => {
         if (!book[CONSTANTS.BOOK_FIELDS.FINISHED]) return false;
@@ -118,31 +118,31 @@ function renderReadingGoalChart(dailyGoal) {
     const actualPages = thisYearBooks.reduce((sum, book) =>
         sum + (parseInt(book[CONSTANTS.BOOK_FIELDS.PAGES]) || 0), 0);
 
-    
+
     // Create goal line data
     const goalLineData = [
         {x: 0, y: 0},
         {x: totalDaysInYear, y: dailyGoal * totalDaysInYear}
     ];
-    
+
     // Create vertical line data for plus marker
     const verticalLineData = [
         {x: daysSinceStart, y: 0},
         {x: daysSinceStart, y: Math.max(actualPages, dailyGoal * daysSinceStart) + 500}
     ];
-    
+
     // Create horizontal line data for plus marker
     const horizontalLineData = [
         {x: 0, y: actualPages},
         {x: totalDaysInYear, y: actualPages}
     ];
-    
+
     // Destroy existing chart
     const existingChart = Chart.getChart('readingGoalChart');
     if (existingChart) {
         existingChart.destroy();
     }
-    
+
     // Create new chart
     new Chart(ctx, {
         type: 'line',
@@ -221,12 +221,12 @@ function renderReadingGoalChart(dailyGoal) {
 
 function renderWhatsNext() {
     const whatsNextContainer = document.getElementById('whatsNextContent');
-    
+
     if (readingList.length === 0) {
         whatsNextContainer.innerHTML = '<p class="goal-placeholder">No books in reading list yet</p>';
         return;
     }
-    
+
     // Sort by rank (ranked items first, then unranked), take first 5
     const sortedList = [...readingList]
         .sort((a, b) => {
@@ -271,48 +271,40 @@ function renderLibraryStats() {
 // Simple drag and drop for dashboard cards
 let draggedCard = null;
 
-function enableDashboardDragDrop() {
+async function enableDashboardDragDrop() {
     const cards = document.querySelectorAll('.dashboard-card');
-    
+
     cards.forEach(card => {
         card.draggable = true;
         card.style.cursor = 'move';
-        
+
         card.ondragstart = function(e) {
             draggedCard = this;
             this.style.opacity = '0.5';
         };
-        
+
         card.ondragover = function(e) {
             e.preventDefault();
         };
-        
-        card.ondrop = function(e) {
+
+        card.ondrop = async function(e) {
             e.preventDefault();
             if (draggedCard !== this) {
-                // Get parent container
                 const container = this.parentNode;
-                
-                // Get positions
                 const cards = Array.from(container.children);
                 const draggedIndex = cards.indexOf(draggedCard);
                 const targetIndex = cards.indexOf(this);
-                
-                // Remove dragged card and insert at new position
                 draggedCard.remove();
                 if (targetIndex < draggedIndex) {
                     container.insertBefore(draggedCard, this);
                 } else {
                     container.insertBefore(draggedCard, this.nextSibling);
                 }
-                
-                // Save the new order (just IDs)
-                saveDashboardOrder();
-                
+                await saveDashboardOrder();
                 showMessage('Dashboard cards reordered', CONSTANTS.MESSAGE_TYPES.SUCCESS);
             }
         };
-        
+
         card.ondragend = function(e) {
             this.style.opacity = '1';
             draggedCard = null;
@@ -321,37 +313,33 @@ function enableDashboardDragDrop() {
 }
 
 
-function saveDashboardOrder() {
+async function saveDashboardOrder() {
     const cards = document.querySelectorAll('.dashboard-card');
     const order = Array.from(cards).map(card => card.id);
-    DataManager.saveSection('DashboardOrder', order);
+    await DBManager.put(CONSTANTS.STORES.SETTINGS, {
+        id: 'dashboard-order',
+        data: order
+    });
 }
 
-
-function loadDashboardOrder() {
-    const savedOrder = DataManager.loadSection('DashboardOrder', null);
+async function loadDashboardOrder() {
+    const row = await DBManager.get(CONSTANTS.STORES.SETTINGS, 'dashboard-order');
+    const savedOrder = row ? row.data : null;
     if (!savedOrder || !Array.isArray(savedOrder) || savedOrder.length !== 6) return false;
-    
+
     const dashboardGrid = document.querySelector('.dashboard-grid');
     if (!dashboardGrid) return false;
-    
-    // Create a map of cards by ID
+
     const cardMap = {};
     dashboardGrid.querySelectorAll('.dashboard-card').forEach(card => {
         cardMap[card.id] = card;
     });
-    
-    // Reorder cards according to saved order
+
     savedOrder.forEach(cardId => {
         if (cardMap[cardId]) {
             dashboardGrid.appendChild(cardMap[cardId]);
         }
     });
-    
+
     return true;
 }
-
-
-
-
-

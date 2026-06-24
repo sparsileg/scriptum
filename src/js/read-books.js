@@ -1,16 +1,17 @@
 // functions relating to books that have been read
 
-let books = [], currentFilters = {};
-let currentSort = { 
-    field: CONSTANTS.BOOK_FIELDS.FINISHED, 
-    direction: CONSTANTS.SORT_DIRECTIONS.DESC, 
-    group: false 
+// read-books.js state
+let currentFilters = {};
+let currentSort = {
+    field: CONSTANTS.BOOK_FIELDS.FINISHED,
+    direction: CONSTANTS.SORT_DIRECTIONS.DESC,
+    group: false
 };
 
 const BOOK_CATEGORIES = [
     "Adventure", "Biography", "Business", "Children's", "Contemporary Fiction",
     "Cooking", "Fantasy", "Fiction", "Health & Fitness", "Historical Fiction",
-    "History", "Horror", "Literary Fiction", "Memoir", "Mystery", 
+    "History", "Horror", "Literary Fiction", "Memoir", "Mystery",
     "Non-Fiction", "Philosophy", "Poetry", "Psychology", "Reference",
     "Religion", "Romance", "Science", "Science Fiction", "Self-Help",
     "Thriller", "Travel", "True Crime", "Young Adult"
@@ -23,13 +24,13 @@ function generateCategoryOptions() {
 
 function populateCategorySelects() {
     const categoryOptions = generateCategoryOptions();
-    
+
     // Populate main form category select
     const categorySelect = document.getElementById('category');
     if (categorySelect) {
         categorySelect.innerHTML = categoryOptions;
     }
-    
+
     // Populate edit form category select
     const editCategorySelect = document.getElementById('editCategory');
     if (editCategorySelect) {
@@ -69,7 +70,7 @@ function enterReadBook(event) {
     books.push(book);
     saveData();
     event.target.reset();
-    
+
     // Check if this was initiated from reading list and remove the item
     const pendingRemoval = sessionStorage.getItem('pendingReadingListRemoval');
     if (pendingRemoval) {
@@ -79,7 +80,7 @@ function enterReadBook(event) {
     } else {
         showMessage('Book added successfully', CONSTANTS.MESSAGE_TYPES.SUCCESS);
     }
-    
+
     // Navigate to Books Read view
     showView(CONSTANTS.VIEWS.REVIEW, document.querySelector('[onclick*="review"]'));
 }
@@ -88,10 +89,10 @@ function enterReadBook(event) {
 function cancelAddBook() {
     // Clear the form
     document.getElementById('bookForm').reset();
-    
+
     // Clear any pending reading list removal
     sessionStorage.removeItem('pendingReadingListRemoval');
-    
+
     // Navigate to dashboard
     showView(CONSTANTS.VIEWS.DASHBOARD, document.querySelector('[onclick*="dashboard"]'));
 }
@@ -104,17 +105,17 @@ function cancelEdit() {
 function renderReadBooks() {
     const tbody = document.getElementById('booksTableBody');
     let filteredBooks = applyCurrentFilters([...books]);
-    
+
     // Check if we're filtering for multiple reads
-    const hasMultipleReadsFilter = Object.values(currentFilters).some(filter => 
+    const hasMultipleReadsFilter = Object.values(currentFilters).some(filter =>
         filter.field === 'MultipleReads'
     );
-    
+
     if (hasMultipleReadsFilter) {
         renderMultipleReadsBooks(filteredBooks);
         return;
     }
-    
+
     // Regular rendering logic continues...
     let sortedBooks = applySortAndGroup(filteredBooks);
     tbody.innerHTML = '';
@@ -136,16 +137,16 @@ function renderReadBooks() {
 function updateTableHeaders() {
     const thead = document.querySelector('#booksHeaderTable thead tr');
     const fields = ['Finished', 'Title', 'Author', 'Pages', 'Category', 'Recommend'];
-    
+
     thead.innerHTML = fields.map(field => {
         const isActive = currentSort.field === field;
         let indicator = '';
-        
+
         if (isActive) {
             const arrow = currentSort.direction === 'asc' ? '▲' : '▼';
             indicator = `<span class="sort-indicator">${arrow}</span>`;
         }
-        
+
         return `
             <th onclick="showSortDropdown(event, '${field}')">
                 ${field === 'Recommend' ? 'Like' : field}${indicator}
@@ -158,7 +159,7 @@ function updateTableHeaders() {
 function createReadBookRow(book, index) {
     const row = document.createElement('tr');
     row.onclick = () => editReadBookById(book.id); // Use ID instead of index
-    
+
     // Add context menu for ISBN lookup
     row.oncontextmenu = (e) => {
         e.preventDefault();
@@ -210,18 +211,18 @@ function editReadBookById(id) {
         showMessage('Book not found', CONSTANTS.MESSAGE_TYPES.ERROR);
         return;
     }
-    
+
     document.getElementById('editIndex').value = id;
     document.getElementById('editFinished').value = dateFromStorage(book[CONSTANTS.BOOK_FIELDS.FINISHED] || '');
     document.getElementById('editTitle').value = book[CONSTANTS.BOOK_FIELDS.TITLE] || '';
     document.getElementById('editAuthor').value = book[CONSTANTS.BOOK_FIELDS.AUTHOR] || '';
     document.getElementById('editPages').value = book[CONSTANTS.BOOK_FIELDS.PAGES] || '';
     document.getElementById('editRecommend').value = book[CONSTANTS.BOOK_FIELDS.RECOMMEND] || '';
-    document.getElementById('editISBN').value = book[CONSTANTS.BOOK_FIELDS.ISBN] || '';    
+    document.getElementById('editISBN').value = book[CONSTANTS.BOOK_FIELDS.ISBN] || '';
     document.getElementById('editComments').value = book[CONSTANTS.BOOK_FIELDS.COMMENTS] || '';
 
     showView(CONSTANTS.VIEWS.EDIT);
-    
+
     setTimeout(() => {
         document.getElementById('editCategory').value = book[CONSTANTS.BOOK_FIELDS.CATEGORY] || '';
     }, 10);
@@ -233,12 +234,12 @@ function saveEditReadBook(event) {
     const formData = new FormData(event.target);
     const id = formData.get('editIndex'); // This is now an ID, not index
     const bookIndex = findBookIndexById(id);
-    
+
     if (bookIndex === -1) {
         showMessage('Book not found', CONSTANTS.MESSAGE_TYPES.ERROR);
         return;
     }
-    
+
     const book = { id }; // Preserve the ID
 
     // Map form data to storage format with capitalized field names
@@ -267,14 +268,14 @@ function saveEditReadBook(event) {
 function deleteReadBookById(id) {
     const book = findBookById(id);
     const bookIndex = findBookIndexById(id);
-    
+
     if (!book || bookIndex === -1) {
         showMessage('Book not found', CONSTANTS.MESSAGE_TYPES.ERROR);
         return;
     }
-    
+
     const confirmed = confirm(`⚠️ REMOVE BOOK?\n\nTitle: "${book.Title}"\nAuthor: ${book.Author}\n\nThis cannot be undone.`);
-    
+
     if (confirmed) {
         books.splice(bookIndex, 1);
         saveData();
@@ -595,12 +596,12 @@ function updateFilterOptions(select) {
             { value: 'isEmpty', text: 'Is Empty' },
             { value: 'contains', text: 'Contains' }
         ];
-        break;        
+        break;
     case 'MultipleReads':
         operators = [
             { value: 'gte', text: 'Greater than or equal to' }
         ];
-        break;        
+        break;
     }
 
     operators.forEach(op => {
@@ -631,7 +632,7 @@ function updateFilterOptions(select) {
         break;
     case 'ISBN':
         defaultOperator = 'isEmpty';  // Most useful for finding books without ISBNs
-        break;        
+        break;
     }
 
     if (defaultOperator) {
@@ -775,13 +776,13 @@ function applyCurrentFilters(books) {
                 if (filter.field === 'MultipleReads') {
                     // Use normalized matching
                     const bookKey = normalizeBookKey(book.Title, book.Author);
-                    const readCount = books.filter(b => 
+                    const readCount = books.filter(b =>
                         normalizeBookKey(b.Title, b.Author) === bookKey
                     ).length;
                     return readCount >= parseInt(filter.values[0] || 2);
                 } else {
                     return parseInt(fieldValue) >= parseInt(filter.values[0] || 0);
-                }                
+                }
             case 'equals':
                 return fieldValue === filter.values[0];
             default:
@@ -804,7 +805,7 @@ function renderMultipleReadsBooks(filteredBooks) {
         }
         grouped[key].push(book);
     });
-    
+
     // Sort each group by date ascending and render
     Object.entries(grouped).forEach(([key, bookGroup]) => {
         // Sort this group by date ascending
@@ -837,15 +838,15 @@ function normalizeBookKey(title, author) {
                   .replace(/[.,;:!?]/g, '')    // Remove common punctuation
                   .replace(/\s*-\s*/g, '-');   // Normalize hyphens
     };
-    
+
     let normalizedAuthor = normalizeString(author);
-    
+
     // Handle "Lastname, Firstname" format - convert to "firstname lastname"
     if (normalizedAuthor.includes(',')) {
         const parts = normalizedAuthor.split(',').map(part => part.trim());
         normalizedAuthor = `${parts[1]} ${parts[0]}`.trim();
     }
-    
+
     return `${normalizeString(title)}|||${normalizedAuthor}`;
 }
 
@@ -859,11 +860,11 @@ function dateToISO(storageDate) {
             const day = parts[0].padStart(2, '0');
             const monthAbbr = parts[1];
             const year = parts[2];
-            
+
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const monthNum = months.indexOf(monthAbbr);
-            
+
             if (monthNum !== -1) {
                 const month = (monthNum + 1).toString().padStart(2, '0');
                 return `${year}-${month}-${day}`;
@@ -879,17 +880,17 @@ function dateToISO(storageDate) {
 // Helper function to escape CSV values
 function escapeCSV(value) {
     if (value === null || value === undefined) return '';
-    
+
     const stringValue = String(value);
-    
+
     // Check if the value needs to be quoted
-    if (stringValue.includes(',') || stringValue.includes('"') || 
+    if (stringValue.includes(',') || stringValue.includes('"') ||
         stringValue.includes('\n') || stringValue.includes('\r')) {
         // Escape double quotes by doubling them
         const escaped = stringValue.replace(/"/g, '""');
         return `"${escaped}"`;
     }
-    
+
     return stringValue;
 }
 
@@ -897,9 +898,9 @@ function escapeCSV(value) {
 // Helper function to escape TSV values
 function escapeTSV(value) {
     if (value === null || value === undefined) return '';
-    
+
     const stringValue = String(value);
-    
+
     // Replace tabs with spaces and escape special characters
     return stringValue
         .replace(/\t/g, ' ')
@@ -930,7 +931,7 @@ window.onclick = function(event) {
 function generateExportMetadata() {
     const now = new Date();
     const filteredBooks = applyCurrentFilters([...books]);
-    
+
     const metadata = {
         timestamp: now.toISOString(),
         totalBooksInDatabase: books.length,
@@ -938,7 +939,7 @@ function generateExportMetadata() {
         appliedFilters: [],
         quickSearch: document.getElementById('quickSearch').value || null
     };
-    
+
     // Convert currentFilters to readable format
     Object.values(currentFilters).forEach(filter => {
         if (filter.field !== 'all') {
@@ -949,7 +950,7 @@ function generateExportMetadata() {
             });
         }
     });
-    
+
     return metadata;
 }
 
@@ -958,12 +959,12 @@ function generateTimestampedFilename(baseFilename, extension) {
     const filteredBooks = applyCurrentFilters([...books]);
     const hasQuickSearch = document.getElementById('quickSearch').value.trim();
     const hasFilters = Object.keys(currentFilters).length > 0 && !currentFilters.quickSearch;
-    
+
     // If no filters or search, use simple filename
     if (!hasQuickSearch && !hasFilters && filteredBooks.length === books.length) {
         return `books-read.${extension}`;
     }
-    
+
     // Otherwise use timestamped filename
     const now = new Date();
     const timestamp = now.getFullYear() +
@@ -972,7 +973,7 @@ function generateTimestampedFilename(baseFilename, extension) {
         String(now.getHours()).padStart(2, '0') +
         String(now.getMinutes()).padStart(2, '0') +
         String(now.getSeconds()).padStart(2, '0');
-    
+
     return `${baseFilename}_${timestamp}.${extension}`;
 }
 
@@ -983,18 +984,18 @@ function generateCSVTSVHeader(metadata) {
         `# Total Books in Database: ${metadata.totalBooksInDatabase}`,
         `# Filtered Results: ${metadata.filteredBooks} books`
     ];
-    
+
     if (metadata.appliedFilters.length > 0) {
         metadata.appliedFilters.forEach(filter => {
             const valueStr = filter.values.join(', ');
             lines.push(`# Applied Filter: ${filter.field} ${filter.operator} ${valueStr}`);
         });
     }
-    
+
     if (metadata.quickSearch) {
         lines.push(`# Quick Search: ${metadata.quickSearch}`);
     }
-    
+
     lines.push(''); // Empty line before headers
     return lines.join('\n') + '\n';
 }
@@ -1006,11 +1007,11 @@ async function lookupISBN(title, author) {
         // Try OpenLibrary first
         const openLibraryResult = await searchOpenLibrary(title, author);
         if (openLibraryResult) return openLibraryResult;
-        
+
         // Fallback to Google Books
         const googleBooksResult = await searchGoogleBooks(title, author);
         if (googleBooksResult) return googleBooksResult;
-        
+
         return null;
     } catch (error) {
         console.error('ISBN lookup error:', error);
@@ -1021,7 +1022,7 @@ async function lookupISBN(title, author) {
 
 function parseAuthorName(authorString) {
     if (!authorString) return { first: '', last: '', original: authorString };
-    
+
     // Handle "Lastname, Firstname" format
     if (authorString.includes(',')) {
         const parts = authorString.split(',').map(part => part.trim());
@@ -1032,7 +1033,7 @@ function parseAuthorName(authorString) {
             reversed: `${parts[1]} ${parts[0]}`.trim()
         };
     }
-    
+
     // Handle "Firstname Lastname" format
     const parts = authorString.split(' ');
     return {
@@ -1046,7 +1047,7 @@ function parseAuthorName(authorString) {
 
 async function searchOpenLibrary(title, author) {
     const authorInfo = parseAuthorName(author);
-    
+
     // Create multiple author format variations
     const authorVariations = [
         authorInfo.original,           // "Lastname, Firstname"
@@ -1054,10 +1055,10 @@ async function searchOpenLibrary(title, author) {
         authorInfo.last,               // Just "Lastname"
         `${authorInfo.first} ${authorInfo.last}`.trim() // Explicit "First Last"
     ].filter(variation => variation && variation.length > 0);
-    
+
     // Try multiple search strategies with author variations
     const searches = [];
-    
+
     authorVariations.forEach(authorVar => {
         searches.push(
             `title:"${title}" author:"${authorVar}"`,           // Exact match
@@ -1066,13 +1067,13 @@ async function searchOpenLibrary(title, author) {
             `title:${title.split(':')[0]} author:"${authorVar}"` // Title without subtitle
         );
     });
-    
+
     for (const query of searches) {
         try {
             const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`;
             const response = await fetch(url);
             const data = await response.json();
-            
+
             if (data.docs && data.docs.length > 0) {
                 // Find best match by confidence score
                 const bestMatch = data.docs
@@ -1082,7 +1083,7 @@ async function searchOpenLibrary(title, author) {
                     }))
                     .filter(book => book.confidence > 50)
                     .sort((a, b) => b.confidence - a.confidence)[0];
-                
+
                 if (bestMatch && bestMatch.confidence > 60) {
                     // If we have a cover_edition_key, get the full edition details
                     if (bestMatch.cover_edition_key) {
@@ -1090,11 +1091,11 @@ async function searchOpenLibrary(title, author) {
                             const editionUrl = `https://openlibrary.org/books/${bestMatch.cover_edition_key}.json`;
                             const editionResponse = await fetch(editionUrl);
                             const editionData = await editionResponse.json();
-                            
+
                             // Extract ISBNs from the edition data
                             const isbn10List = editionData.isbn_10 || [];
                             const isbn13List = editionData.isbn_13 || [];
-                            
+
                             return {
                                 isbn: isbn10List[0] || null,
                                 isbn13: isbn13List[0] || null,
@@ -1108,7 +1109,7 @@ async function searchOpenLibrary(title, author) {
                             console.error('Error fetching edition details:', error);
                         }
                     }
-                    
+
                     // Fallback to original method if edition fetch fails
                     return {
                         isbn: null,
@@ -1133,18 +1134,18 @@ async function searchOpenLibrary(title, author) {
 
 function calculateAdvancedConfidence(searchTitle, searchAuthorInfo, resultTitle, resultAuthors) {
     let confidence = 0;
-    
+
     // Title similarity (60% weight)
     const titleSimilarity = calculateTitleSimilarity(searchTitle, resultTitle);
     confidence += titleSimilarity * 0.6;
-    
+
     // Author similarity (40% weight) - check multiple formats
     let bestAuthorMatch = 0;
     const authorArray = Array.isArray(resultAuthors) ? resultAuthors : [resultAuthors || ''];
-    
+
     authorArray.forEach(resultAuthor => {
         const resultAuthorInfo = parseAuthorName(resultAuthor);
-        
+
         // Try different comparison strategies
         const similarities = [
             calculateStringSimilarity(searchAuthorInfo.original.toLowerCase(), resultAuthor.toLowerCase()),
@@ -1153,33 +1154,33 @@ function calculateAdvancedConfidence(searchTitle, searchAuthorInfo, resultTitle,
             // Check if last names match exactly (high confidence indicator)
             searchAuthorInfo.last.toLowerCase() === resultAuthorInfo.last.toLowerCase() ? 0.9 : 0
         ];
-        
+
         bestAuthorMatch = Math.max(bestAuthorMatch, ...similarities);
     });
-    
+
     confidence += bestAuthorMatch * 0.4;
-    
+
     return Math.round(confidence * 100);
 }
 
 
 function calculateTitleSimilarity(title1, title2) {
     if (!title1 || !title2) return 0;
-    
+
     const clean1 = title1.toLowerCase().replace(/[^\w\s]/g, '');
     const clean2 = title2.toLowerCase().replace(/[^\w\s]/g, '');
-    
+
     // Check for exact match after cleaning
     if (clean1 === clean2) return 1.0;
-    
+
     // Check if one title contains the other (handles subtitles)
     if (clean1.includes(clean2) || clean2.includes(clean1)) return 0.85;
-    
+
     // Word-based similarity
     const words1 = clean1.split(/\s+/).filter(w => w.length > 2);
     const words2 = clean2.split(/\s+/).filter(w => w.length > 2);
     const commonWords = words1.filter(word => words2.includes(word));
-    
+
     return commonWords.length / Math.max(words1.length, words2.length);
 }
 
@@ -1189,18 +1190,18 @@ async function searchGoogleBooks(title, author) {
     const authorInfo = parseAuthorName(author);
     const authorVariations = [
         authorInfo.reversed,    // "Firstname Lastname" (Google Books prefers this)
-        authorInfo.original,    // "Lastname, Firstname"  
+        authorInfo.original,    // "Lastname, Firstname"
         authorInfo.last         // Just surname
     ].filter(variation => variation && variation.length > 0);
-    
+
     for (const authorVar of authorVariations) {
         const query = `intitle:"${title}" inauthor:"${authorVar}"`;
         const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=3`;
-        
+
         try {
             const response = await fetch(url);
             const data = await response.json();
-            
+
             if (data.items && data.items.length > 0) {
                 const bestMatch = data.items
                     .map(item => ({
@@ -1209,11 +1210,11 @@ async function searchGoogleBooks(title, author) {
                     }))
                     .filter(item => item.confidence > 60)
                     .sort((a, b) => b.confidence - a.confidence)[0];
-                
+
                 if (bestMatch) {
                     const book = bestMatch.volumeInfo;
                     const industryIdentifiers = book.industryIdentifiers || [];
-                    
+
                     return {
                         isbn: industryIdentifiers.find(id => id.type === 'ISBN_10')?.identifier || null,
                         isbn13: industryIdentifiers.find(id => id.type === 'ISBN_13')?.identifier || null,
@@ -1234,12 +1235,12 @@ async function searchGoogleBooks(title, author) {
 
 function calculateStringSimilarity(str1, str2) {
     if (!str1 || !str2) return 0;
-    
+
     // Simple similarity based on common words
     const words1 = str1.split(/\s+/);
     const words2 = str2.split(/\s+/);
     const commonWords = words1.filter(word => words2.includes(word));
-    
+
     return commonWords.length / Math.max(words1.length, words2.length);
 }
 
@@ -1252,4 +1253,3 @@ function findBookById(id) {
 function findBookIndexById(id) {
     return books.findIndex(book => book.id === id);
 }
-

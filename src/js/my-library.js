@@ -1,6 +1,5 @@
 // myLibrary.js - My Library functionality
 
-let myLibrary = [];
 let currentMyLibrarySort = { field: 'Title', direction: 'asc', group: false };
 let currentMyLibraryFilters = {};
 
@@ -26,9 +25,9 @@ function generateMyLibraryId() {
 function populateMyLibraryBookshelfSelects() {
     const addSelect = document.getElementById('myLibraryAddBookshelf');
     const editSelect = document.getElementById('myLibraryEditBookshelf');
-    
+
     const options = MY_LIBRARY_BOOKSHELVES.map(shelf => `<option value="${shelf}">${shelf}</option>`).join('');
-    
+
     if (addSelect) addSelect.innerHTML = options;
     if (editSelect) editSelect.innerHTML = options;
 }
@@ -37,10 +36,10 @@ function populateMyLibraryBookshelfSelects() {
 // Populate category selects
 function populateMyLibraryCategorySelects() {
     const categoryOptions = generateCategoryOptions();
-    
+
     const addSelect = document.getElementById('myLibraryAddCategory');
     const editSelect = document.getElementById('myLibraryEditCategory');
-    
+
     if (addSelect) addSelect.innerHTML = categoryOptions;
     if (editSelect) editSelect.innerHTML = categoryOptions;
 }
@@ -51,7 +50,7 @@ function updateMyLibraryLocationFields(mode) {
     const typeSelect = document.getElementById(`myLibrary${mode}LocationType`);
     const bookshelfGroup = document.getElementById(`myLibrary${mode}BookshelfGroup`);
     const otherGroup = document.getElementById(`myLibrary${mode}OtherGroup`);
-    
+
     if (typeSelect.value === 'Bookshelf') {
         bookshelfGroup.style.display = 'flex';
         otherGroup.style.display = 'none';
@@ -82,7 +81,7 @@ function cancelMyLibraryAdd() {
 function addToMyLibrary(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    
+
     const locationType = document.getElementById('myLibraryAddLocationType').value;
     let location;
     if (locationType === 'Bookshelf') {
@@ -90,7 +89,7 @@ function addToMyLibrary(event) {
     } else {
         location = document.getElementById('myLibraryAddOther').value;
     }
-    
+
     // Replace the author assignment with:
     const authorGiven = document.getElementById('myLibraryAddAuthorGiven').value;
     const authorSurname = document.getElementById('myLibraryAddAuthorSurname').value;
@@ -123,10 +122,10 @@ function addToMyLibrary(event) {
 function editMyLibraryBook(id) {
     const book = myLibrary.find(b => b.id === id);
     if (!book) return;
-    
+
     populateMyLibraryCategorySelects();
     populateMyLibraryBookshelfSelects();
-    
+
     document.getElementById('myLibraryEditId').value = id;
     document.getElementById('myLibraryEditTitle').value = book.Title;
     document.getElementById('myLibraryEditAuthor').value = book.Author;
@@ -136,18 +135,18 @@ function editMyLibraryBook(id) {
     document.getElementById('myLibraryEditPatron').value = book.Patron || '';
     document.getElementById('myLibraryEditCheckedOutDate').value = book.CheckedOutDate || '';
     document.getElementById('myLibraryEditTags').value = tagsToString(book.Tags || []);
-   
+
     // Handle location
     const isBookshelf = MY_LIBRARY_BOOKSHELVES.includes(book.Location);
     document.getElementById('myLibraryEditLocationType').value = isBookshelf ? 'Bookshelf' : 'Other';
     updateMyLibraryLocationFields('Edit');
-    
+
     if (isBookshelf) {
         document.getElementById('myLibraryEditBookshelf').value = book.Location;
     } else {
         document.getElementById('myLibraryEditOther').value = book.Location;
     }
-    
+
     document.getElementById('myLibraryEditModal').style.display = 'block';
 }
 
@@ -155,11 +154,11 @@ function editMyLibraryBook(id) {
 // Save edit and return to library view
 function saveMyLibraryEdit(event) {
     event.preventDefault();
-    
+
     const id = document.getElementById('myLibraryEditId').value;
     const book = myLibrary.find(b => b.id === id);
     if (!book) return;
-    
+
     const locationType = document.getElementById('myLibraryEditLocationType').value;
     let location;
     if (locationType === 'Bookshelf') {
@@ -167,7 +166,7 @@ function saveMyLibraryEdit(event) {
     } else {
         location = document.getElementById('myLibraryEditOther').value;
     }
-    
+
     const tagsInput = document.getElementById('myLibraryEditTags').value;
     const tags = parseTagsFromString(tagsInput);
 
@@ -180,7 +179,7 @@ function saveMyLibraryEdit(event) {
     book.Patron = document.getElementById('myLibraryEditPatron').value || null;
     book.CheckedOutDate = document.getElementById('myLibraryEditCheckedOutDate').value || null;
     book.Tags = tags;
-    
+
     saveMyLibraryData();
     document.getElementById('myLibraryEditModal').style.display = 'none';
     renderMyLibrary();
@@ -191,25 +190,25 @@ function saveMyLibraryEdit(event) {
 // Process checkout and return to library view
 function processMyLibraryCheckout(event) {
     event.preventDefault();
-    
+
     const id = document.getElementById('myLibraryCheckoutId').value;
     const patron = document.getElementById('myLibraryCheckoutPatron').value;
     const book = myLibrary.find(b => b.id === id);
-    
+
     if (!book) return;
-    
+
     book.Patron = patron;
     book.CheckedOutDate = new Date().toISOString().split('T')[0];
-    
+
     // Check if this book is already on the reading list and remove it
     const existingReadingListIndex = readingList.findIndex(item => item.MyLibraryId === book.id);
     if (existingReadingListIndex !== -1) {
         const existingBook = readingList[existingReadingListIndex];
         const existingRank = existingBook.Rank;
-        
+
         // Remove the existing item
         readingList.splice(existingReadingListIndex, 1);
-        
+
         // Shift ranks up if the removed item had a rank
         if (existingRank) {
             readingList.forEach(item => {
@@ -219,7 +218,7 @@ function processMyLibraryCheckout(event) {
             });
         }
     }
-    
+
     // Add to reading list at top with checkout annotation
     const newReadingListItem = {
         [CONSTANTS.BOOK_FIELDS.ID]: generateReadingListId(),
@@ -230,16 +229,16 @@ function processMyLibraryCheckout(event) {
         IsCheckedOut: true,
         MyLibraryId: book.id
     };
-    
+
     // Shift all existing ranked items down by 1
     readingList.forEach(item => {
         if (item.Rank) {
             item.Rank++;
         }
     });
-    
+
     readingList.unshift(newReadingListItem);
-    
+
     saveMyLibraryData();
     saveReadingListData();
     document.getElementById('myLibraryCheckoutModal').style.display = 'none';
@@ -258,11 +257,11 @@ function cancelMyLibraryEdit() {
 function deleteMyLibraryBook() {
     const id = document.getElementById('myLibraryEditId').value;
     const book = myLibrary.find(b => b.id === id);
-    
+
     if (!book) return;
-    
+
     const confirmed = confirm(`⚠️ DELETE BOOK?\n\nTitle: "${book.Title}"\nAuthor: ${book.Author}\n\nThis cannot be undone.`);
-    
+
     if (confirmed) {
         const index = myLibrary.findIndex(b => b.id === id);
         myLibrary.splice(index, 1);
@@ -278,7 +277,7 @@ function deleteMyLibraryBook() {
 function showMyLibraryCheckout(id) {
     const book = myLibrary.find(b => b.id === id);
     if (!book) return;
-    
+
     document.getElementById('myLibraryCheckoutId').value = id;
     document.getElementById('myLibraryCheckoutBookInfo').innerHTML = `
         <p><strong>Title:</strong> ${book.Title}</p>
@@ -300,11 +299,11 @@ function cancelMyLibraryCheckout() {
 function addMyLibraryToReadingList(id) {
     const book = myLibrary.find(b => b.id === id);
     if (!book) return;
-    
+
     // Find the lowest rank to add this book at the end
     const rankedBooks = readingList.filter(b => b.Rank);
     const highestRank = rankedBooks.length > 0 ? Math.max(...rankedBooks.map(b => b.Rank)) : 0;
-    
+
     const newReadingListItem = {
         [CONSTANTS.BOOK_FIELDS.ID]: generateReadingListId(),
         [CONSTANTS.BOOK_FIELDS.TITLE]: book.Title,
@@ -313,7 +312,7 @@ function addMyLibraryToReadingList(id) {
         Rank: highestRank + 1,
         MyLibraryId: book.id
     };
-    
+
     readingList.push(newReadingListItem);
     saveReadingListData();
     renderMyLibrary(); // Re-render to hide the "To Read" button
@@ -326,9 +325,9 @@ function renderMyLibrary() {
     const tbody = document.getElementById('myLibraryTableBody');
     let filteredBooks = applyCurrentMyLibraryFilters([...myLibrary]);
     let sortedBooks = applyMyLibrarySortAndGroup(filteredBooks);
-    
+
     tbody.innerHTML = '';
-    
+
     if (currentMyLibrarySort.group) {
         renderGroupedMyLibraryBooks(sortedBooks, tbody);
     } else {
@@ -344,7 +343,7 @@ function renderMyLibrary() {
 function createMyLibraryRow(book) {
     const row = document.createElement('tr');
     row.onclick = () => editMyLibraryBook(book.id);
-    
+
     // Add context menu for ISBN lookup
     row.oncontextmenu = (e) => {
         e.preventDefault();
@@ -352,13 +351,13 @@ function createMyLibraryRow(book) {
             lookupMyLibraryBookISBN(book.id);
         }
     };
-    
+
     const checkedOutStatus = book.Patron ? `C/O ${book.Patron}` : 'Available';
     const hasISBN = book.ISBN ? '📚' : '❓';
-    
+
     // Check if this book is already on the reading list
     const isOnReadingList = readingList.some(item => item.MyLibraryId === book.id);
-    
+
     row.innerHTML = `
         <td>${book.Title} ${hasISBN}</td>
         <td>${book.Author}</td>
@@ -370,7 +369,7 @@ function createMyLibraryRow(book) {
             ${book.Patron ? `<button class="btn btn-small btn-primary" onclick="checkInMyLibraryBook('${book.id}')">C/I</button>` : ''}
         </td>
     `;
-    
+
     return row;
 }
 
@@ -380,13 +379,13 @@ function applyMyLibrarySortAndGroup(books) {
     const sorted = [...books].sort((a, b) => {
         let aVal = a[currentMyLibrarySort.field] || '';
         let bVal = b[currentMyLibrarySort.field] || '';
-        
+
         // Handle special cases
         if (currentMyLibrarySort.field === 'CheckedOut') {
             aVal = a.Patron ? `C/O ${a.Patron}` : 'Available';
             bVal = b.Patron ? `C/O ${b.Patron}` : 'Available';
         }
-        
+
         if (aVal < bVal) return currentMyLibrarySort.direction === 'asc' ? -1 : 1;
         if (aVal > bVal) return currentMyLibrarySort.direction === 'asc' ? 1 : -1;
         return 0;
@@ -430,20 +429,20 @@ function renderGroupedMyLibraryBooks(groupedBooks, tbody) {
 function updateMyLibraryTableHeaders() {
     const thead = document.querySelector('#myLibraryHeaderTable thead tr');
     const fields = ['Title', 'Author', 'Category', 'CheckedOut'];
-    
+
     const headers = fields.map(field => {
         const isActive = currentMyLibrarySort.field === field;
         let indicator = '';
-        
+
         if (isActive) {
             const arrow = currentMyLibrarySort.direction === 'asc' ? '▲' : '▼';
             indicator = `<span class="sort-indicator">${arrow}</span>`;
         }
-        
+
         const displayName = field === 'CheckedOut' ? 'Status' : field;
         return `<th onclick="showMyLibrarySortDropdown(event, '${field}')">${displayName}${indicator}</th>`;
     }).join('');
-    
+
     thead.innerHTML = headers + '<th>Actions</th>';
 }
 
@@ -762,21 +761,21 @@ function applyCurrentMyLibraryFilters(books) {
                 // Handle text search
                 const searchTerm = filter.values[0];
                 let textMatch = true;
-                
+
                 if (searchTerm && searchTerm.trim()) {
                     const searchableFields = [book.Title, book.Author, book.Category, book.Location, book.Patron].join(' ').toLowerCase();
                     textMatch = searchableFields.includes(searchTerm);
                 }
-                
+
                 // Handle tag search (AND logic)
                 let tagMatch = true;
                 if (filter.tags && filter.tags.length > 0) {
                     const bookTags = book.Tags || [];
-                    tagMatch = filter.tags.every(searchTag => 
+                    tagMatch = filter.tags.every(searchTag =>
                         bookTags.some(bookTag => bookTag.includes(searchTag))
                     );
                 }
-                
+
                 return textMatch && tagMatch;
             }
 
@@ -824,7 +823,7 @@ function performMyLibraryQuickSearch(searchTerm) {
     const searchParts = searchTerm.toLowerCase().split(/\s+/);
     const tagQueries = [];
     const textQueries = [];
-    
+
     searchParts.forEach(part => {
         if (part.startsWith('#') && part.length > 1) {
             tagQueries.push(part.substring(1));
@@ -852,19 +851,19 @@ function performMyLibraryQuickSearch(searchTerm) {
 function parseCSVContent(csvText) {
     const result = [];
     const lines = csvText.split(/\r?\n/);
-    
+
     for (let line of lines) {
         line = line.trim();
         if (!line) continue;
-        
+
         const row = [];
         let currentField = '';
         let inQuotes = false;
         let i = 0;
-        
+
         while (i < line.length) {
             const char = line[i];
-            
+
             if (char === '"') {
                 if (inQuotes && line[i + 1] === '"') {
                     // Handle escaped quotes ("")
@@ -886,12 +885,12 @@ function parseCSVContent(csvText) {
                 i++;
             }
         }
-        
+
         // Add the last field
         row.push(currentField.trim());
         result.push(row);
     }
-    
+
     return result;
 }
 
@@ -908,12 +907,12 @@ function exportMyLibraryData() {
         totalBooksInLibrary: myLibrary.length,
         filteredBooks: filteredBooks.length
     };
-    
+
     const dataToExport = {
         exportInfo: metadata,
         MyLibrary: filteredBooks
     };
-    
+
     const dataStr = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const filename = generateTimestampedFilename('my_library', 'json');
@@ -933,9 +932,9 @@ function exportMyLibraryData() {
 function exportMyLibraryCSV() {
     const filteredBooks = applyCurrentMyLibraryFilters([...myLibrary]);
     const headers = ['Title', 'Author', 'Category', 'ISBN', 'Pages', 'Location', 'Patron', 'CheckedOutDate'];
-    
+
     let csvContent = headers.join(',') + '\n';
-    
+
     filteredBooks.forEach(book => {
         const row = [
             escapeCSV(book.Title),
@@ -949,10 +948,10 @@ function exportMyLibraryCSV() {
         ];
         csvContent += row.join(',') + '\n';
     });
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const filename = generateTimestampedFilename('my_library', 'csv');
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -961,7 +960,7 @@ function exportMyLibraryCSV() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showMessage(`Library CSV exported: ${filteredBooks.length} books saved to ${filename}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
 
@@ -975,7 +974,7 @@ function migrateMyLibraryItems() {
             migrated++;
         }
     });
-    
+
     if (migrated > 0) {
         saveMyLibraryData();
         showMessage(`Migrated ${migrated} library items to include unique IDs`, CONSTANTS.MESSAGE_TYPES.INFO);
@@ -989,12 +988,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addForm) {
         addForm.addEventListener('submit', addToMyLibrary);
     }
-    
+
     const editForm = document.getElementById('myLibraryEditForm');
     if (editForm) {
         editForm.addEventListener('submit', saveMyLibraryEdit);
     }
-    
+
     const checkoutForm = document.getElementById('myLibraryCheckoutForm');
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', processMyLibraryCheckout);
@@ -1012,9 +1011,9 @@ function clearAllMyLibraryBooks() {
         showMessage('Library is already empty', CONSTANTS.MESSAGE_TYPES.INFO);
         return;
     }
-    
+
     const confirmed = confirm(`⚠️ CLEAR ALL LIBRARY BOOKS?\n\nThis will delete all ${myLibrary.length} books from your library.\n\nThis action cannot be undone.\n\nAre you sure?`);
-    
+
     if (confirmed) {
         const deletedCount = myLibrary.length;
         myLibrary = [];
@@ -1033,7 +1032,7 @@ function startMyLibraryCSVImport() {
     if (categorySelect) {
         categorySelect.innerHTML = generateCategoryOptions();
     }
-    
+
     // Show the category selection modal
     document.getElementById('myLibraryCategorySelectModal').style.display = 'block';
 }
@@ -1041,17 +1040,17 @@ function startMyLibraryCSVImport() {
 // Handle category selection and proceed to file selection
 function proceedWithCategorySelection(event) {
     event.preventDefault();
-    
+
     selectedImportCategory = document.getElementById('myLibraryImportCategory').value;
-    
+
     if (!selectedImportCategory) {
         showMessage('Please select a category', CONSTANTS.MESSAGE_TYPES.ERROR);
         return;
     }
-    
+
     // Hide the modal
     document.getElementById('myLibraryCategorySelectModal').style.display = 'none';
-    
+
     // Trigger file selection
     document.getElementById('importMyLibraryFile').click();
 }
@@ -1077,17 +1076,17 @@ function importMyLibraryCSV() {
     reader.onload = function(e) {
         try {
             const csvContent = e.target.result;
-            
+
             // Use a proper CSV parser that handles quotes
             const parsedData = parseCSVContent(csvContent);
-            
+
             if (parsedData.length === 0) {
                 showMessage('No data found in CSV file', CONSTANTS.MESSAGE_TYPES.ERROR);
                 return;
             }
-            
+
             const headers = parsedData[0];
-            
+
             // Validate headers
             const requiredHeaders = ['Title', 'Author', 'ISBN', 'Location'];
             const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
@@ -1095,12 +1094,12 @@ function importMyLibraryCSV() {
                 showMessage(`Missing required headers: ${missingHeaders.join(', ')}`, CONSTANTS.MESSAGE_TYPES.ERROR);
                 return;
             }
-            
+
             let imported = 0;
             for (let i = 1; i < parsedData.length; i++) {
                 const values = parsedData[i];
                 if (values.length === 0) continue;
-                
+
                 const book = {
                     id: generateMyLibraryId(),
                     Title: values[headers.indexOf('Title')] || '',
@@ -1112,25 +1111,25 @@ function importMyLibraryCSV() {
                     CheckedOutDate: null,
                     Patron: null
                 };
-                
+
                 if (book.Title && book.Author) {
                     myLibrary.push(book);
                     imported++;
                 }
             }
-            
+
             saveMyLibraryData();
             renderMyLibrary();
             showMessage(`Imported ${imported} books to library with category "${selectedImportCategory}"`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
-            
+
             // Reset the selected category
             selectedImportCategory = null;
-            
+
         } catch (error) {
             showMessage('Error parsing CSV file: ' + error.message, CONSTANTS.MESSAGE_TYPES.ERROR);
             selectedImportCategory = null;
         }
-        
+
         document.getElementById('importMyLibraryFile').value = '';
     };
     reader.readAsText(file);
@@ -1151,27 +1150,27 @@ async function bulkMyLibraryISBNLookup() {
 function checkInMyLibraryBook(id) {
     const book = myLibrary.find(b => b.id === id);
     if (!book || !book.Patron) return;
-    
+
     const patron = book.Patron;
     const confirmed = confirm(`Check in "${book.Title}" from ${patron}?`);
-    
+
     if (confirmed) {
         // Clear checkout information
         book.Patron = null;
         book.CheckedOutDate = null;
-        
+
         // Remove from reading list if it's there as a checked-out item
-        const readingListIndex = readingList.findIndex(item => 
+        const readingListIndex = readingList.findIndex(item =>
             item.MyLibraryId === book.id && item.IsCheckedOut
         );
-        
+
         if (readingListIndex !== -1) {
             const readingListBook = readingList[readingListIndex];
             const bookRank = readingListBook.Rank;
-            
+
             // Remove from reading list
             readingList.splice(readingListIndex, 1);
-            
+
             // Shift ranks up if necessary
             if (bookRank) {
                 readingList.forEach(item => {
@@ -1180,14 +1179,12 @@ function checkInMyLibraryBook(id) {
                     }
                 });
             }
-            
+
             saveReadingListData();
         }
-        
+
         saveMyLibraryData();
         renderMyLibrary();
         showMessage(`"${book.Title}" checked in successfully`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
     }
 }
-
-

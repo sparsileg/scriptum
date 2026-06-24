@@ -4,20 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Tracker</title>
-    <script src="include/pako.min.js"></script>
-    <script src="include/chart.min.js"></script>
-    <script src="js/version.js"></script>
-    <script src="js/core.js"></script>
-    <script src="js/data-manager.js"></script>
-    <script src="js/file.js"></script>
-    <script src="js/isbn.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/read-books.js"></script>
-    <script src="js/statistics.js"></script>
-    <script src="js/reading-list.js"></script>
-    <script src="js/my-library.js"></script>
-    <script src="js/tags.js"></script>
-    <link rel="stylesheet" href="css/nordic-dark.css" id="themeLink">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/themes/nordic-dark.css" id="themeLink">
+
   </head>
   <body>
     <div class="container">
@@ -333,10 +323,10 @@
             <label for="displayTheme">Display Theme:</label>
             <div class="theme-buttons">
               <button type="button" class="btn btn-theme"
-                      onclick="changeTheme('css/nordic-dark.css')">Dark</button> <button type="button" class="btn btn-theme"
-                      onclick="changeTheme('css/nordic-light.css')">Light</button>
+                      onclick="changeTheme('css/themes/nordic-dark.css')">Dark</button> <button type="button" class="btn btn-theme"
+                      onclick="changeTheme('css/themes/nordic-light.css')">Light</button>
               <button type="button" class="btn btn-theme"
-                      onclick="changeTheme('css/matrix-code.css')">Matrix</button>
+                      onclick="changeTheme('css/themes/matrix.css')">Matrix</button>
             </div>
           </div>
 
@@ -670,5 +660,24 @@
 
 
     </div> <!-- end of Container -->
+
+    <!-- Scripts - load in dependency order -->
+    <script src="include/pako.min.js"></script>
+    <script src="include/chart.min.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/db-manager-web.js"></script>
+    <script src="js/db-manager-tauri.js"></script>
+    <script src="js/db-manager.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/file.js"></script>
+    <script src="js/isbn.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/read-books.js"></script>
+    <script src="js/statistics.js"></script>
+    <script src="js/reading-list.js"></script>
+    <script src="js/my-library.js"></script>
+    <script src="js/tags.js"></script>
+
   </body>
 </html>

@@ -1,0 +1,149 @@
+/*
+  css/themes/nordic-light.css
+  Nordic Light theme — variables only. All structural CSS lives in base.css.
+*/
+
+:root {
+    /* ── Fonts ──────────────────────────────────────────────────────────────── */
+    --font-body:  'Segoe UI', 'Inter', sans-serif;
+    --font-ui:    'Segoe UI', 'Inter', sans-serif;
+    --font-mono:  'Consolas', 'Monaco', monospace;
+
+    /* ── Core palette ───────────────────────────────────────────────────────── */
+    --color-bg-page:         #eceff4;
+    --color-bg-surface:      #ffffff;
+    --color-bg-raised:       #e5e9f0;
+    --color-bg-raised-hover: #d8dee9;
+
+    --color-text-primary:    #2e3440;
+    --color-text-secondary:  #5e81ac;
+    --color-text-muted:      #81a1c1;
+
+    --color-accent-primary:   #5e81ac;
+    --color-accent-secondary: #88c0d0;
+
+    --color-header: #2e3440;
+    --color-label:  #3b4252;
+
+    /* ── Borders ────────────────────────────────────────────────────────────── */
+    --color-border:        #d8dee9;
+    --color-border-subtle: #d8dee9;
+
+    /* ── Navigation ─────────────────────────────────────────────────────────── */
+    --color-nav-bg:           transparent;
+    --color-nav-text:         #3b4252;
+    --color-nav-hover-bg:     #5e81ac;
+    --color-nav-hover-text:   #eceff4;
+    --color-nav-hover-border: #5e81ac;
+
+    /* ── Inputs ─────────────────────────────────────────────────────────────── */
+    --color-input-bg:    transparent;
+    --color-option-bg:   #ffffff;
+    --input-border-bottom: 2px solid #d8dee9;
+
+    /* ── Buttons ────────────────────────────────────────────────────────────── */
+    --btn-border:            2px solid #5e81ac;
+    --color-btn-bg:          transparent;
+    --color-btn-text:        #5e81ac;
+    --color-btn-hover-bg:    #5e81ac;
+    --color-btn-hover-text:  #eceff4;
+
+    --btn-primary-border:           2px solid #88c0d0;
+    --color-btn-primary-bg:         transparent;
+    --color-btn-primary-text:       #88c0d0;
+    --color-btn-primary-hover-bg:   #88c0d0;
+    --color-btn-primary-hover-text: #2e3440;
+
+    --btn-secondary-border:            2px solid #81a1c1;
+    --color-btn-secondary-bg:          transparent;
+    --color-btn-secondary-text:        #81a1c1;
+    --color-btn-secondary-hover-bg:    #81a1c1;
+    --color-btn-secondary-hover-text:  #ffffff;
+
+    --color-danger:       #dc3545;
+    --color-danger-text:  #ffffff;
+    --color-danger-hover: #c82333;
+
+    /* ── Tables ─────────────────────────────────────────────────────────────── */
+    --color-table-header-bg:    #d8dee9;
+    --color-table-header-hover: #5e81ac;
+    --color-table-row-hover:    #e5e9f0;
+    --table-border:     none;
+    --table-th-border:  none;
+    --table-td-border:  none;
+
+    /* ── Message area ───────────────────────────────────────────────────────── */
+    --color-message-bg:   #d8dee9;
+    --color-message-text: #a3be8c;
+
+    /* ── Modal ──────────────────────────────────────────────────────────────── */
+    --color-modal-overlay: rgba(236, 239, 244, 0.9);
+
+    /* ── Sticky headers ─────────────────────────────────────────────────────── */
+    --color-sticky-header-bg: #ffffff;
+
+    /* ── Misc UI ────────────────────────────────────────────────────────────── */
+    --color-checked-out-bg: #d8dee9;
+    --color-drag-over-bg:   #d8dee9;
+
+    /* ── Shadows ────────────────────────────────────────────────────────────── */
+    --shadow-surface:      0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-card:         0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-panel:        0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-table:        none;
+    --shadow-list-item:    none;
+    --shadow-message:      none;
+    --shadow-dropdown:     0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-modal:        0 8px 16px rgba(0, 0, 0, 0.15);
+    --shadow-nav-active:   none;
+    --shadow-btn-hover:    none;
+    --shadow-focus:        none;
+    --shadow-interactive:  none;
+    --shadow-drag-over:    none;
+    --shadow-checked-out:  none;
+    --shadow-export-hover: none;
+    --shadow-danger-hover: none;
+
+    /* ── Text shadows ───────────────────────────────────────────────────────── */
+    --text-shadow-accent:     none;
+    --text-shadow-subtle:     none;
+    --text-shadow-nav-active: none;
+    --text-shadow-btn-hover:  none;
+
+    /* ── Typography ─────────────────────────────────────────────────────────── */
+    --font-weight-heading:  400;
+    --header-h1-transform:  none;
+    --header-h1-spacing:    normal;
+    --header-animation:     none;
+    --nav-text-transform:   none;
+    --nav-letter-spacing:   normal;
+    --label-letter-spacing: 0.5px;
+    --btn-letter-spacing:   0.5px;
+    --border-radius:        2px;
+    --nav-gap:              0;
+
+    /* ── Select arrow ───────────────────────────────────────────────────────── */
+    --select-arrow-svg: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b4252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+
+    /* ── Calendar picker ────────────────────────────────────────────────────── */
+    --calendar-picker-filter: none;
+
+    /* ── Export item hover overlay ──────────────────────────────────────────── */
+    --export-item-hover-overlay: none;
+
+    /* ── Body scanline effect — none for nordic themes ──────────────────────── */
+    --body-before-content: none;
+    --body-before-bg: none;
+}
+
+/* Nordic Light nav active state */
+.nav-btn.active {
+    background: #88c0d0;
+    color: #2e3440;
+    border-color: #88c0d0;
+}
+
+/* Light theme table header hover — text goes light */
+.data-table th:hover {
+    color: #eceff4;
+}

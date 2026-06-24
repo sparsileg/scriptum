@@ -3,12 +3,12 @@
 function exportFilteredData() {
     const filteredBooks = applyCurrentFilters([...books]);
     const metadata = generateExportMetadata();
-    
+
     const dataToExport = {
         exportInfo: metadata,
         BooksRead: filteredBooks
     };
-    
+
     const dataStr = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const filename = generateTimestampedFilename('books_filtered', 'json');
@@ -29,14 +29,14 @@ function exportFilteredData() {
 function exportFilteredCSV() {
     const filteredBooks = applyCurrentFilters([...books]);
     const metadata = generateExportMetadata();
-    const headers = [CONSTANTS.BOOK_FIELDS.FINISHED, CONSTANTS.BOOK_FIELDS.TITLE, CONSTANTS.BOOK_FIELDS.AUTHOR, 
-                   CONSTANTS.BOOK_FIELDS.ISBN, CONSTANTS.BOOK_FIELDS.PAGES, CONSTANTS.BOOK_FIELDS.CATEGORY, 
+    const headers = [CONSTANTS.BOOK_FIELDS.FINISHED, CONSTANTS.BOOK_FIELDS.TITLE, CONSTANTS.BOOK_FIELDS.AUTHOR,
+                   CONSTANTS.BOOK_FIELDS.ISBN, CONSTANTS.BOOK_FIELDS.PAGES, CONSTANTS.BOOK_FIELDS.CATEGORY,
                    CONSTANTS.BOOK_FIELDS.RECOMMEND, CONSTANTS.BOOK_FIELDS.COMMENTS];
-    
+
     // Create CSV content with metadata header
     let csvContent = generateCSVTSVHeader(metadata);
     csvContent += headers.join(',') + '\n';
-    
+
     filteredBooks.forEach(book => {
         const row = [
             escapeCSV(dateToISO(book[CONSTANTS.BOOK_FIELDS.FINISHED])),
@@ -50,10 +50,10 @@ function exportFilteredCSV() {
         ];
         csvContent += row.join(',') + '\n';
     });
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const filename = generateTimestampedFilename('books_filtered', 'csv');
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -62,7 +62,7 @@ function exportFilteredCSV() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showMessage(`Filtered CSV exported: ${filteredBooks.length} books saved to ${filename}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
 
@@ -70,14 +70,14 @@ function exportFilteredCSV() {
 function exportFilteredTSV() {
     const filteredBooks = applyCurrentFilters([...books]);
     const metadata = generateExportMetadata();
-    const headers = [CONSTANTS.BOOK_FIELDS.FINISHED, CONSTANTS.BOOK_FIELDS.TITLE, CONSTANTS.BOOK_FIELDS.AUTHOR, 
-                   CONSTANTS.BOOK_FIELDS.ISBN, CONSTANTS.BOOK_FIELDS.PAGES, CONSTANTS.BOOK_FIELDS.CATEGORY, 
+    const headers = [CONSTANTS.BOOK_FIELDS.FINISHED, CONSTANTS.BOOK_FIELDS.TITLE, CONSTANTS.BOOK_FIELDS.AUTHOR,
+                   CONSTANTS.BOOK_FIELDS.ISBN, CONSTANTS.BOOK_FIELDS.PAGES, CONSTANTS.BOOK_FIELDS.CATEGORY,
                    CONSTANTS.BOOK_FIELDS.RECOMMEND, CONSTANTS.BOOK_FIELDS.COMMENTS];
-    
+
     // Create TSV content with metadata header
     let tsvContent = generateCSVTSVHeader(metadata);
     tsvContent += headers.join('\t') + '\n';
-    
+
     filteredBooks.forEach(book => {
         const row = [
             escapeTSV(dateToISO(book[CONSTANTS.BOOK_FIELDS.FINISHED])),
@@ -91,10 +91,10 @@ function exportFilteredTSV() {
         ];
         tsvContent += row.join('\t') + '\n';
     });
-    
+
     const blob = new Blob([tsvContent], { type: 'text/plain;charset=utf-8;' });
     const filename = generateTimestampedFilename('books_filtered', 'tsv');
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -103,7 +103,7 @@ function exportFilteredTSV() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showMessage(`Filtered TSV exported: ${filteredBooks.length} books saved to ${filename}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
 
@@ -113,7 +113,7 @@ function saveDatabaseFile() {
     const dataToExport = generateUnifiedDatabase();
     const dataStr = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -122,7 +122,7 @@ function saveDatabaseFile() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showMessage('Database saved as bt-data.json', CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
 
@@ -132,13 +132,13 @@ function backupDatabaseFile() {
     const dateStr = now.getFullYear() +
           String(now.getMonth() + 1).padStart(2, '0') +
           String(now.getDate()).padStart(2, '0');
-    
+
     const dataToExport = generateUnifiedDatabase();
     const dataStr = JSON.stringify(dataToExport, null, 2);
-    
+
     let blob;
     let filename = `bt-data-${dateStr}.json`;
-    
+
     // Try to use gzip compression if pako is available
     if (typeof pako !== 'undefined') {
         try {
@@ -156,7 +156,7 @@ function backupDatabaseFile() {
         blob = new Blob([dataStr], { type: 'application/json' });
         showMessage('Compression library not available, saved uncompressed backup', CONSTANTS.MESSAGE_TYPES.INFO);
     }
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -165,86 +165,81 @@ function backupDatabaseFile() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showMessage(`Database backup saved as ${filename}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
 
-function importData() {
+async function importData() {
     const file = document.getElementById('importFile').files[0];
     if (!file) return;
-
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const importedData = JSON.parse(e.target.result);
             let booksToValidate;
 
-            // Handle unified format or legacy format
+            // Handle unified format
             if (importedData.BooksRead && Array.isArray(importedData.BooksRead)) {
                 booksToValidate = importedData.BooksRead;
-                
-                // Load reading list if present
+
                 if (importedData.ReadingList && Array.isArray(importedData.ReadingList)) {
                     readingList = importedData.ReadingList;
-                    saveReadingListData();
+                    await saveReadingListData();
                 }
 
-                // handle My Library if present
                 if (importedData.MyLibrary && Array.isArray(importedData.MyLibrary)) {
                     myLibrary = importedData.MyLibrary;
-                    saveMyLibraryData();
+                    await saveMyLibraryData();
                 }
 
-                // Load settings if present
                 if (importedData.Settings) {
                     if (importedData.Settings.dailyReadingPages) {
-                        localStorage.setItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES, 
-                                           importedData.Settings.dailyReadingPages.toString());
+                        localStorage.setItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES,
+                            importedData.Settings.dailyReadingPages.toString());
                     }
-                    // Apply the imported theme
                     if (importedData.Settings.displayTheme) {
-                        changeTheme(importedData.Settings.displayTheme);
+                        changeTheme(sanitiseThemePath(importedData.Settings.displayTheme));
+                    }
+                    // Save dashboard order if present
+                    if (importedData.Settings.dashboardOrder) {
+                        await saveSettingsToDB({ dashboardOrder: importedData.Settings.dashboardOrder });
                     }
                 }
-                
-                // Add this section after the existing Settings handling in importData function:
-                if (importedData.Settings && importedData.Settings.dashboardOrder) {
-                    DataManager.saveSection('DashboardOrder', importedData.Settings.dashboardOrder);
-                }              
 
                 let msg = `Database loaded successfully. ${booksToValidate.length} books read. `;
                 msg += `${readingList.length} in reading list. `;
                 msg += `${myLibrary.length} in library.`;
                 showMessage(msg, CONSTANTS.MESSAGE_TYPES.SUCCESS);
+
             } else if (Array.isArray(importedData)) {
-                // Legacy format - direct array
+                // Legacy format — direct array of books
                 booksToValidate = importedData;
-                showMessage(`Legacy data imported successfully. ${booksToValidate.length} books loaded.`, 
-                           CONSTANTS.MESSAGE_TYPES.SUCCESS);
+                showMessage(`Legacy data imported successfully. ${booksToValidate.length} books loaded.`,
+                    CONSTANTS.MESSAGE_TYPES.SUCCESS);
             } else {
-                showMessage('Invalid file format. Expected unified database or book array.', 
-                           CONSTANTS.MESSAGE_TYPES.ERROR);
+                showMessage('Invalid file format. Expected unified database or book array.',
+                    CONSTANTS.MESSAGE_TYPES.ERROR);
                 return;
             }
 
             // Validate and assign
             if (!validateBookData(booksToValidate)) {
-                showMessage('Invalid book data. Each book must have Title and Author fields.', 
-                           CONSTANTS.MESSAGE_TYPES.ERROR);
+                showMessage('Invalid book data. Each book must have Title and Author fields.',
+                    CONSTANTS.MESSAGE_TYPES.ERROR);
                 return;
             }
 
             books = booksToValidate;
-            saveData();
+            await saveData();
             renderReadBooks();
-            renderDashboard(); // Update dashboard with new data
-            
+            renderDashboard();
+
         } catch (error) {
             showMessage('Error parsing file: ' + error.message, CONSTANTS.MESSAGE_TYPES.ERROR);
         }
-        // Clear the file input so the same file can be selected again
+
+        // Clear the file input so the same file can be re-selected
         document.getElementById('importFile').value = '';
     };
     reader.readAsText(file);
 }
-
