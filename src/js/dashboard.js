@@ -78,9 +78,10 @@ function renderRecentBooks() {
 }
 
 
-function renderReadingGoals() {
+async function renderReadingGoals() {
     const goalDisplay = document.getElementById('goalDisplay');
-    const dailyGoal = parseInt(localStorage.getItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES)) || null;
+    const settings = await loadSettingsFromDB() || {};
+    const dailyGoal = settings.dailyReadingPages || null;
 
     if (!dailyGoal) {
         goalDisplay.innerHTML = '<p class="goal-placeholder">Set a daily reading goal in Settings to track progress</p>';

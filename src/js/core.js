@@ -1,13 +1,13 @@
 // ── App initialisation ────────────────────────────────────────────────────────
 
 window.onload = async function () {
-    loadTheme();
-
-    // Initialise the database backend (IndexedDB in browser, no-op in Tauri)
+    // Initialise the database backend first so loadTheme can read from IndexedDB
     await DBManager.init();
 
     // One-time migration from old localStorage blob if present
     await migrateFromLocalStorage();
+
+    await loadTheme();
 
     // Load all collections into memory
     await loadData();
@@ -125,25 +125,23 @@ function generateBookId() {
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 
-function changeTheme(themePath) {
+async function loadTheme() {
+    const settings = await loadSettingsFromDB() || {};
+    const theme = settings.displayTheme
+        ? sanitiseThemePath(settings.displayTheme)
+        : CONSTANTS.THEMES.NORDIC_DARK;
+    document.getElementById('themeLink').href = theme;
+}
+
+async function changeTheme(themePath) {
     const themeLink = document.getElementById('themeLink');
     themeLink.href = themePath;
-    localStorage.setItem(CONSTANTS.STORAGE_KEYS.SELECTED_THEME, themePath);
+    const current = await loadSettingsFromDB() || {};
+    await saveSettingsToDB({ ...current, displayTheme: themePath });
 
     if (document.getElementById('statisticsView').classList.contains('active')) {
         if (typeof destroyCharts === 'function') destroyCharts();
         renderStatistics();
-    }
-}
-
-function loadTheme() {
-    const saved = localStorage.getItem(CONSTANTS.STORAGE_KEYS.SELECTED_THEME);
-    // Sanitise in case a legacy path is stored
-    const theme = saved ? sanitiseThemePath(saved) : CONSTANTS.THEMES.NORDIC_DARK;
-    document.getElementById('themeLink').href = theme;
-    if (saved !== theme) {
-        // Update stored value if it was a legacy path
-        localStorage.setItem(CONSTANTS.STORAGE_KEYS.SELECTED_THEME, theme);
     }
 }
 
@@ -163,11 +161,12 @@ function getThemeColors() {
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 
-function loadSettings() {
-    setTimeout(() => {
+async function loadSettings() {
+    setTimeout(async () => {
         const pagesInput = document.getElementById('dailyReadingPages');
         if (pagesInput) {
-            pagesInput.value = localStorage.getItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES) || '';
+            const settings = await loadSettingsFromDB() || {};
+            pagesInput.value = settings.dailyReadingPages || '';
         }
     }, 50);
 }
@@ -176,13 +175,11 @@ async function saveSettings(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const dailyReadingPages = formData.get('dailyReadingPages');
-
-    if (dailyReadingPages) {
-        localStorage.setItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES, dailyReadingPages);
-    } else {
-        localStorage.removeItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES);
-    }
-
+    const current = await loadSettingsFromDB() || {};
+    await saveSettingsToDB({
+        ...current,
+        dailyReadingPages: dailyReadingPages ? parseInt(dailyReadingPages) : null
+    });
     showMessage('Settings saved successfully', CONSTANTS.MESSAGE_TYPES.SUCCESS);
     showView('dashboard', document.querySelector('[onclick*="dashboard"]'));
 }

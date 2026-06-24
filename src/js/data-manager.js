@@ -23,29 +23,22 @@ let myLibrary   = [];   // MyLibrary
 async function migrateFromLocalStorage() {
     const legacy = localStorage.getItem(CONSTANTS.STORAGE_KEYS.BOOKS_DATA);
     if (!legacy) return;
-
     console.log('Migrating data from localStorage to IndexedDB...');
     try {
         const data = JSON.parse(legacy);
-
         if (data.BooksRead && data.BooksRead.length > 0) {
-            // Ensure every record has an id before storing
             data.BooksRead.forEach(b => { if (!b.id) b.id = generateBookId(); });
             await DBManager.putBulk(CONSTANTS.STORES.BOOKS_READ, data.BooksRead);
         }
-
         if (data.ReadingList && data.ReadingList.length > 0) {
             data.ReadingList.forEach(b => { if (!b.id) b.id = generateBookId(); });
             await DBManager.putBulk(CONSTANTS.STORES.READING_LIST, data.ReadingList);
         }
-
         if (data.MyLibrary && data.MyLibrary.length > 0) {
             data.MyLibrary.forEach(b => { if (!b.id) b.id = generateBookId(); });
             await DBManager.putBulk(CONSTANTS.STORES.MY_LIBRARY, data.MyLibrary);
         }
-
         if (data.Settings) {
-            // Sanitise theme path in case it's a legacy value
             if (data.Settings.displayTheme) {
                 data.Settings.displayTheme = sanitiseThemePath(data.Settings.displayTheme);
             }
@@ -54,7 +47,20 @@ async function migrateFromLocalStorage() {
                 data: data.Settings
             });
         }
-
+        // Migrate dailyReadingPages from localStorage into settings
+        const dailyReadingPages = localStorage.getItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES);
+        if (dailyReadingPages) {
+            const current = await loadSettingsFromDB() || {};
+            await saveSettingsToDB({ ...current, dailyReadingPages: parseInt(dailyReadingPages) });
+            localStorage.removeItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES);
+        }
+        // Migrate selectedTheme from localStorage into settings
+        const savedTheme = localStorage.getItem(CONSTANTS.STORAGE_KEYS.SELECTED_THEME);
+        if (savedTheme) {
+            const current = await loadSettingsFromDB() || {};
+            await saveSettingsToDB({ ...current, displayTheme: sanitiseThemePath(savedTheme) });
+            localStorage.removeItem(CONSTANTS.STORAGE_KEYS.SELECTED_THEME);
+        }
         // Migration complete — remove legacy blob
         localStorage.removeItem(CONSTANTS.STORAGE_KEYS.BOOKS_DATA);
         console.log('localStorage migration complete');
@@ -240,9 +246,9 @@ async function generateUnifiedDatabase() {
         },
         TagsMetadata: tagsMetadata,
         Settings: {
-            displayTheme:      localStorage.getItem(CONSTANTS.STORAGE_KEYS.SELECTED_THEME) || CONSTANTS.THEMES.NORDIC_DARK,
-            dailyReadingPages: parseInt(localStorage.getItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES)) || null,
-            ...settings
+            ...settings,
+            displayTheme:      settings.displayTheme || CONSTANTS.THEMES.NORDIC_DARK,
+            dailyReadingPages: settings.dailyReadingPages || null
         }
     };
 }
