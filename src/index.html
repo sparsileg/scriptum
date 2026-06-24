@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Tracker</title>
+    <script src="include/pako.min.js"></script>
+    <script src="include/chart.min.js"></script>
     <script src="js/version.js"></script>
     <script src="js/core.js"></script>
     <script src="js/data-manager.js"></script>
@@ -15,8 +17,6 @@
     <script src="js/reading-list.js"></script>
     <script src="js/my-library.js"></script>
     <script src="js/tags.js"></script>
-    <script src="js/pako.min.js"></script>
-    <script src="js/chart.min.js"></script>
     <link rel="stylesheet" href="css/nordic-dark.css" id="themeLink">
   </head>
   <body>
@@ -64,7 +64,7 @@
             <div class="stat-row">
               <span class="stat-label">Avg Pages/Day:</span>
               <span class="stat-value" id="dashAvgPagesDay">0</span>
-            </div>            
+            </div>
           </div>
 
           <!-- Quick Actions -->
@@ -192,7 +192,7 @@
       <div id="reviewView" class="view">
         <!-- Fixed Header Section -->
         <div class="books-read-fixed-header">
-          <h2>Book Review 
+          <h2>Book Review
             <span class="search-icon" onclick="showFilter()">🔍</span>
             <div class="export-dropdown">
               <button class="export-btn" onclick="toggleExportDropdown()">Export ▼</button>
@@ -204,7 +204,7 @@
             </div>
             <button class="btn btn-secondary btn-header" style="margin-left: 10px;" onclick="bulkISBNLookup()">Lookup ISBNs</button>
           </h2>
-          
+
           <div id="filterPanel" class="filter-panel" style="display: none;">
             <h3>Search</h3>
             <div class="quick-search">
@@ -216,7 +216,7 @@
             <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
             <button class="btn btn-secondary" onclick="hideFilter()">Close</button>
           </div>
-          
+
           <!-- Fixed Table Header -->
           <div class="books-read-table-header">
             <table class="data-table" id="booksHeaderTable">
@@ -233,7 +233,7 @@
             </table>
           </div>
         </div>
-        
+
         <!-- Scrollable Content Area -->
         <div class="books-read-scrollable-content">
           <table class="data-table" id="booksTable">
@@ -290,7 +290,7 @@
           </div>
           <button type="submit" class="btn btn-primary">Save Changes</button>
           <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
-          <button type="button" class="btn btn-danger" 
+          <button type="button" class="btn btn-danger"
                   onclick="deleteReadBookById(document.getElementById('editIndex').value)">Remove from Books Read</button>
         </form>
       </div> <!-- end of EditView -->
@@ -298,7 +298,7 @@
       <!-- Statistics View -->
       <div id="statisticsView" class="view">
         <h2>Statistics</h2>
-        
+
         <div class="stats-section">
           <h3>Totals</h3>
           <div class="stats-grid">
@@ -311,13 +311,13 @@
               <span class="stat-label">Pages Read</span>
             </div>
           </div>
-          
+
           <div class="category-stats">
             <h4>Books by Category</h4>
             <canvas id="categoryChart" width="400" height="200"></canvas>
           </div>
         </div>
-        
+
         <div class="stats-section">
           <h3>Yearly Statistics</h3>
           <canvas id="yearlyChart" width="400" height="300"></canvas>
@@ -327,7 +327,7 @@
       <!-- Settings View -->
       <div id="settingsView" class="view">
         <h2>Settings</h2>
-        
+
         <form id="settingsForm" onsubmit="saveSettings(event)">
           <div class="form-group">
             <label for="displayTheme">Display Theme:</label>
@@ -339,13 +339,13 @@
                       onclick="changeTheme('css/matrix-code.css')">Matrix</button>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="dailyReadingPages">Daily Reading Pages:</label>
-            <input type="number" id="dailyReadingPages" name="dailyReadingPages" min="1" max="1000" 
+            <input type="number" id="dailyReadingPages" name="dailyReadingPages" min="1" max="1000"
                    placeholder="0" style="width: 8ch; max-width: 8ch;">
           </div>
-          
+
           <div class="form-group">
             <label>Tag Management:</label>
             <button type="button" class="btn btn-secondary" onclick="showTagManagement()">Manage Tags</button>
@@ -361,7 +361,7 @@
       <!-- To Read View -->
       <div id="toreadView" class="view">
         <h2>Reading List</h2>
-        
+
         <div class="reading-list-container">
           <!-- Add Book Form -->
           <div class="add-book-section">
@@ -434,7 +434,7 @@
       <div id="myLibraryView" class="view">
         <!-- Fixed Header Section -->
         <div class="my-library-fixed-header">
-          <h2>My Library 
+          <h2>My Library
             <span class="search-icon" onclick="showMyLibraryFilter()">🔍</span>
             <div class="export-dropdown">
               <button class="export-btn" onclick="toggleMyLibraryExportDropdown()">Export ▼</button>
@@ -449,7 +449,7 @@
             <button class="btn btn-secondary btn-header" onclick="bulkMyLibraryISBNLookup()">Lookup ISBNs</button>
             <button class="btn btn-danger btn-header" onclick="clearAllMyLibraryBooks()">Clear All Books</button>
           </h2>
-          
+
           <div id="myLibraryFilterPanel" class="filter-panel" style="display: none;">
             <h3>Search</h3>
             <div class="quick-search">
@@ -461,7 +461,7 @@
             <button class="btn btn-secondary" onclick="clearMyLibraryFilters()">Clear Filters</button>
             <button class="btn btn-secondary" onclick="hideMyLibraryFilter()">Close</button>
           </div>
-          
+
           <!-- Fixed Table Header -->
           <div class="my-library-table-header">
             <table class="data-table" id="myLibraryHeaderTable">
@@ -477,7 +477,7 @@
             </table>
           </div>
         </div>
-        
+
         <!-- Scrollable Content Area -->
         <div class="my-library-scrollable-content">
           <table class="data-table" id="myLibraryTable">
@@ -537,7 +537,7 @@
             <div class="form-group">
               <label for="myLibraryAddPages">Pages:</label>
               <input type="number" id="myLibraryAddPages" min="1">
-            </div>            
+            </div>
             <div class="form-group">
               <label for="myLibraryAddTags">Tags:</label>
               <input type="text" id="myLibraryAddTags" placeholder="astronomy, photography (comma-separated)">
