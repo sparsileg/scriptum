@@ -104,14 +104,8 @@ function dateFromStorage(storageDate) {
 
 function dateToStorage(htmlDate) {
     if (!htmlDate) return '';
-    const parts = htmlDate.split('-');
-    if (parts.length === 3) {
-        const months = ['Jan','Feb','Mar','Apr','May','Jun',
-                        'Jul','Aug','Sep','Oct','Nov','Dec'];
-        const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-        return `${date.getDate()}-${months[date.getMonth()]}-${date.getFullYear()}`;
-    }
-    return '';
+    // Input from <input type="date"> is already YYYY-MM-DD — store as-is
+    return htmlDate;
 }
 
 // ── ID generation ─────────────────────────────────────────────────────────────

@@ -109,8 +109,8 @@ function exportFilteredTSV() {
 
 
 // Save Database - saves as bt-data.json
-function saveDatabaseFile() {
-    const dataToExport = generateUnifiedDatabase();
+async function saveDatabaseFile() {
+    const dataToExport = await generateUnifiedDatabase();
     const dataStr = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
 
@@ -127,13 +127,13 @@ function saveDatabaseFile() {
 }
 
 // Backup Database - saves as bt-data-YYYYMMDD.json.gz (compressed if available)
-function backupDatabaseFile() {
+async function backupDatabaseFile() {
     const now = new Date();
     const dateStr = now.getFullYear() +
           String(now.getMonth() + 1).padStart(2, '0') +
           String(now.getDate()).padStart(2, '0');
 
-    const dataToExport = generateUnifiedDatabase();
+    const dataToExport = await generateUnifiedDatabase();
     const dataStr = JSON.stringify(dataToExport, null, 2);
 
     let blob;
@@ -176,69 +176,22 @@ async function importData() {
     reader.onload = async function(e) {
         try {
             const importedData = JSON.parse(e.target.result);
-            let booksToValidate;
-
-            // Handle unified format
-            if (importedData.BooksRead && Array.isArray(importedData.BooksRead)) {
-                booksToValidate = importedData.BooksRead;
-
-                if (importedData.ReadingList && Array.isArray(importedData.ReadingList)) {
-                    readingList = importedData.ReadingList;
-                    await saveReadingListData();
-                }
-
-                if (importedData.MyLibrary && Array.isArray(importedData.MyLibrary)) {
-                    myLibrary = importedData.MyLibrary;
-                    await saveMyLibraryData();
-                }
-
-                if (importedData.Settings) {
-                    if (importedData.Settings.dailyReadingPages) {
-                        localStorage.setItem(CONSTANTS.STORAGE_KEYS.DAILY_READING_PAGES,
-                            importedData.Settings.dailyReadingPages.toString());
-                    }
-                    if (importedData.Settings.displayTheme) {
-                        changeTheme(sanitiseThemePath(importedData.Settings.displayTheme));
-                    }
-                    // Save dashboard order if present
-                    if (importedData.Settings.dashboardOrder) {
-                        await saveSettingsToDB({ dashboardOrder: importedData.Settings.dashboardOrder });
-                    }
-                }
-
-                let msg = `Database loaded successfully. ${booksToValidate.length} books read. `;
-                msg += `${readingList.length} in reading list. `;
-                msg += `${myLibrary.length} in library.`;
-                showMessage(msg, CONSTANTS.MESSAGE_TYPES.SUCCESS);
-
-            } else if (Array.isArray(importedData)) {
-                // Legacy format — direct array of books
-                booksToValidate = importedData;
-                showMessage(`Legacy data imported successfully. ${booksToValidate.length} books loaded.`,
-                    CONSTANTS.MESSAGE_TYPES.SUCCESS);
+            const result = await importUnifiedDatabase(importedData);
+            if (result.success) {
+                showMessage(
+                    `Database loaded successfully. ${result.counts.booksRead} books read, ` +
+                    `${result.counts.readingList} in reading list, ` +
+                    `${result.counts.myLibrary} in library.`,
+                    CONSTANTS.MESSAGE_TYPES.SUCCESS
+                );
+                renderReadBooks();
+                renderDashboard();
             } else {
-                showMessage('Invalid file format. Expected unified database or book array.',
-                    CONSTANTS.MESSAGE_TYPES.ERROR);
-                return;
+                showMessage('Import failed: ' + result.error, CONSTANTS.MESSAGE_TYPES.ERROR);
             }
-
-            // Validate and assign
-            if (!validateBookData(booksToValidate)) {
-                showMessage('Invalid book data. Each book must have Title and Author fields.',
-                    CONSTANTS.MESSAGE_TYPES.ERROR);
-                return;
-            }
-
-            books = booksToValidate;
-            await saveData();
-            renderReadBooks();
-            renderDashboard();
-
         } catch (error) {
             showMessage('Error parsing file: ' + error.message, CONSTANTS.MESSAGE_TYPES.ERROR);
         }
-
-        // Clear the file input so the same file can be re-selected
         document.getElementById('importFile').value = '';
     };
     reader.readAsText(file);

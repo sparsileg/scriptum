@@ -53,6 +53,8 @@ function enterReadBook(event) {
             book['Finished'] = dateToStorage(value);
         } else if (key === 'isbn') {
             book['ISBN'] = value || '';
+        } else if (key === 'recommend') {
+            book['Recommend'] = value === '1' ? 1 : value === '0' ? 0 : null;
         } else if (key === 'authorGiven' || key === 'authorSurname') {
             // Skip individual author fields - we'll handle them separately
             continue;
@@ -177,7 +179,7 @@ function createReadBookRow(book, index) {
         <td>${book.Author || ''}</td>
         <td>${book.Pages || ''}</td>
         <td>${book.Category || ''}</td>
-        <td>${book.Recommend || ''}</td>
+        <td>${book.Recommend === 1 ? 'Y' : book.Recommend === 0 ? 'N' : ''}</td>
     `;
 
     return row;
@@ -217,7 +219,7 @@ function editReadBookById(id) {
     document.getElementById('editTitle').value = book[CONSTANTS.BOOK_FIELDS.TITLE] || '';
     document.getElementById('editAuthor').value = book[CONSTANTS.BOOK_FIELDS.AUTHOR] || '';
     document.getElementById('editPages').value = book[CONSTANTS.BOOK_FIELDS.PAGES] || '';
-    document.getElementById('editRecommend').value = book[CONSTANTS.BOOK_FIELDS.RECOMMEND] || '';
+    document.getElementById('editRecommend').value = book[CONSTANTS.BOOK_FIELDS.RECOMMEND] ?? '';
     document.getElementById('editISBN').value = book[CONSTANTS.BOOK_FIELDS.ISBN] || '';
     document.getElementById('editComments').value = book[CONSTANTS.BOOK_FIELDS.COMMENTS] || '';
 
@@ -249,6 +251,8 @@ function saveEditReadBook(event) {
                 book['Finished'] = dateToStorage(value);
             } else if (key === 'isbn') {
                 book['ISBN'] = value || '';
+            } else if (key === 'recommend') {
+                book['Recommend'] = value === '1' ? 1 : value === '0' ? 0 : null;
             } else {
                 const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
                 book[capitalizedKey] = value || '';
@@ -683,8 +687,8 @@ function updateFilterValue(operatorSelect) {
             valueContainer.innerHTML = `
                             <select class="filter-value-input">
                                 <option value="">Select</option>
-                                <option value="Y">Y</option>
-                                <option value="N">N</option>
+                                <option value="1">Y</option>
+                                <option value="0">N</option>
                             </select>
                         `;
         }

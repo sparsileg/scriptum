@@ -289,42 +289,57 @@ Three collections, each becoming an IndexedDB object store and later a SQLite ta
    ```sql
    -- books_read
    CREATE TABLE IF NOT EXISTS books_read (
-       id          TEXT PRIMARY KEY,
-       title       TEXT NOT NULL,
-       author      TEXT NOT NULL,
-       pages       INTEGER,
-       category    TEXT,
-       recommend   TEXT,
-       isbn        TEXT,
-       comments    TEXT,
-       finished    TEXT        -- YYYY-MM-DD
-   );
+    id          TEXT PRIMARY KEY,
+    title       TEXT NOT NULL,
+    author      TEXT NOT NULL,
+    author2     TEXT,
+    pages       INTEGER,
+    category    TEXT,
+    recommend   INTEGER,              -- 0/1 boolean
+    isbn        TEXT,
+    comments    TEXT,
+    tags            TEXT,           -- JSON array e.g. '["fiction","sci-fi"]'
+    finished    TEXT NOT NULL,        -- YYYY-MM-DD
+    rating      INTEGER,              -- 1-10
+    cover_url   TEXT,
+    date_added  TEXT,                 -- YYYY-MM-DD
+    modified    TEXT                  -- YYYY-MM-DD
+    );
 
    -- reading_list
    CREATE TABLE IF NOT EXISTS reading_list (
-       id          TEXT PRIMARY KEY,
-       title       TEXT NOT NULL,
-       author      TEXT NOT NULL,
-       pages       INTEGER,
-       category    TEXT,
-       isbn        TEXT,
-       comments    TEXT,
-       added_date  TEXT        -- YYYY-MM-DD
-   );
+    id           TEXT PRIMARY KEY,
+    title        TEXT NOT NULL,
+    author       TEXT NOT NULL,
+    author2      TEXT,
+    pages        INTEGER,
+    category     TEXT,
+    isbn         TEXT,
+    comments     TEXT,
+    tags         TEXT,
+    rank         INTEGER,
+    my_library_id TEXT,
+    date_added   TEXT,
+    modified     TEXT
+    );
 
    -- my_library
    CREATE TABLE IF NOT EXISTS my_library (
-       id          TEXT PRIMARY KEY,
-       title       TEXT NOT NULL,
-       author      TEXT NOT NULL,
-       pages       INTEGER,
-       category    TEXT,
-       isbn        TEXT,
-       comments    TEXT,
-       tags        TEXT,       -- JSON array e.g. '["fiction","sci-fi"]'
-       bookshelf   TEXT,
-       added_date  TEXT        -- YYYY-MM-DD
-   );
+    id           TEXT PRIMARY KEY,
+    title        TEXT NOT NULL,
+    author       TEXT NOT NULL,
+    author2      TEXT,
+    pages        INTEGER,
+    category     TEXT,
+    isbn         TEXT,
+    comments     TEXT,
+    tags         TEXT,
+    location     TEXT,
+    patron       TEXT,
+    checked_out  TEXT,
+    date_added   TEXT,
+    modified     TEXT
+    );
 
    -- settings: JSON blob store, keyed by id
    -- 'app-settings' row holds all settings as JSON

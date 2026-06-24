@@ -130,7 +130,11 @@ async function deleteReadingListItem(id) {
 // ── MyLibrary ─────────────────────────────────────────────────────────────────
 
 async function loadMyLibraryData() {
-    myLibrary = await DBManager.getAll(CONSTANTS.STORES.MY_LIBRARY);
+    const raw = await DBManager.getAll(CONSTANTS.STORES.MY_LIBRARY);
+    myLibrary = raw.map(book => ({
+        ...book,
+        Tags: typeof book.Tags === 'string' ? JSON.parse(book.Tags) : (book.Tags || []),
+    }));
 }
 
 async function saveMyLibraryData() {
@@ -273,6 +277,9 @@ async function importUnifiedDatabase(data) {
                 ...book,
                 id: book.id || generateBookId(),
                 Pages: book.Pages ? parseInt(book.Pages) || null : null,
+                Recommend: book.Recommend === 'Y' || book.Recommend === true  || book.Recommend === 1 ? 1
+                         : book.Recommend === 'N' || book.Recommend === false || book.Recommend === 0 ? 0
+                         : null,
             }));
             await DBManager.clear(CONSTANTS.STORES.BOOKS_READ);
             await DBManager.putBulk(CONSTANTS.STORES.BOOKS_READ, prepared);
@@ -295,7 +302,7 @@ async function importUnifiedDatabase(data) {
             const prepared = data.MyLibrary.map(book => ({
                 ...book,
                 id:    book.id || generateBookId(),
-                Tags:  Array.isArray(book.Tags) ? book.Tags : [],
+                Tags:  JSON.stringify(Array.isArray(book.Tags) ? book.Tags : []),
                 Pages: book.Pages ? parseInt(book.Pages) || null : null,
             }));
             await DBManager.clear(CONSTANTS.STORES.MY_LIBRARY);
