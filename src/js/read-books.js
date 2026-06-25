@@ -662,12 +662,12 @@ function updateFilterValue(operatorSelect) {
     switch (operator) {
     case 'between':
         valueContainer.innerHTML = `
-                        <div class="date-range">
-                            <input type="date" class="filter-value-input" placeholder="After">
-                            <span>to</span>
-                            <input type="date" class="filter-value-input" placeholder="Before">
-                        </div>
-                    `;
+          <div class="date-range">
+          <input type="text" class="filter-value-input" placeholder="MM/DD/YYYY" maxlength="10" onblur="validateDateInput(this)" oninput="clearMessage()">
+          <span>to</span>
+          <input type="text" class="filter-value-input" placeholder="MM/DD/YYYY" maxlength="10" onblur="validateDateInput(this)" oninput="clearMessage()">
+        </div>
+        `;
         break;
     case 'contains':
     case 'lte':

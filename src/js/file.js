@@ -108,7 +108,7 @@ function exportFilteredTSV() {
 }
 
 
-// Save Database - saves as bt-data.json
+// Save Database - saves as <APP_NAME>-data.json
 async function saveDatabaseFile() {
     const dataToExport = await generateUnifiedDatabase();
     const dataStr = JSON.stringify(dataToExport, null, 2);
@@ -117,36 +117,65 @@ async function saveDatabaseFile() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'bt-data.json';
+    a.download = `${CONSTANTS.APP_NAME}-data.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showMessage('Database saved as bt-data.json', CONSTANTS.MESSAGE_TYPES.SUCCESS);
+    showMessage(`Data downloaded as ${CONSTANTS.APP_NAME}-data.json`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
 
-// Backup Database - saves as bt-data-YYYYMMDD.json.gz (compressed if available)
+// Backup Database - saves as scriptum-YYYYMMDD.json.gz (compressed if available)
 async function backupDatabaseFile() {
     const now = new Date();
     const dateStr = now.getFullYear() +
           String(now.getMonth() + 1).padStart(2, '0') +
           String(now.getDate()).padStart(2, '0');
-
     const dataToExport = await generateUnifiedDatabase();
     const dataStr = JSON.stringify(dataToExport, null, 2);
+    let filename = `${CONSTANTS.APP_NAME}-${dateStr}.json`;
 
+    // If running in Tauri and a backup folder is set, write directly to disk
+    if (typeof window.__TAURI__ !== 'undefined') {
+        const settings = await loadSettingsFromDB() || {};
+        if (settings.backupFolder) {
+            try {
+                if (typeof pako !== 'undefined') {
+                    // Write compressed binary file
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(dataStr);
+                    const compressed = pako.gzip(data);
+                    const compressedFilename = `${CONSTANTS.APP_NAME}-${dateStr}.json.gz`;
+                    const filePath = `${settings.backupFolder}/${compressedFilename}`;
+                    console.log('Writing compressed backup to:', filePath);
+                    await window.__TAURI_PLUGIN_FS__.writeFile(filePath, compressed);
+                    showMessage(`Database backup saved to ${filePath}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
+                } else {
+                    // Write uncompressed text file
+                    const filePath = `${settings.backupFolder}/${filename}`;
+                    console.log('Writing uncompressed backup to:', filePath);
+                    await window.__TAURI_PLUGIN_FS__.writeTextFile(filePath, dataStr);
+                    showMessage(`Database backup saved to ${filePath}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
+                }
+                return;
+            } catch (e) {
+                console.error('Backup to folder failed:', e);
+                showMessage('Could not write to backup folder: ' + (e.message || JSON.stringify(e)), CONSTANTS.MESSAGE_TYPES.ERROR);
+                return;
+            }
+        }
+    }
+
+    // Fallback: browser download (web build or no backup folder set)
     let blob;
-    let filename = `bt-data-${dateStr}.json`;
-
-    // Try to use gzip compression if pako is available
     if (typeof pako !== 'undefined') {
         try {
             const encoder = new TextEncoder();
             const data = encoder.encode(dataStr);
             const compressed = pako.gzip(data);
             blob = new Blob([compressed], { type: 'application/gzip' });
-            filename = `bt-data-${dateStr}.json.gz`;
+            filename = `scriptum-${dateStr}.json.gz`;
         } catch (e) {
             console.warn('Compression failed, using uncompressed data:', e);
             blob = new Blob([dataStr], { type: 'application/json' });
@@ -156,7 +185,6 @@ async function backupDatabaseFile() {
         blob = new Blob([dataStr], { type: 'application/json' });
         showMessage('Compression library not available, saved uncompressed backup', CONSTANTS.MESSAGE_TYPES.INFO);
     }
-
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -165,7 +193,6 @@ async function backupDatabaseFile() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
     showMessage(`Database backup saved as ${filename}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
 

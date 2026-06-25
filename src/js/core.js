@@ -56,6 +56,8 @@ function showView(viewName, buttonElement) {
 
 // ── Message area ──────────────────────────────────────────────────────────────
 
+let _errorDismissTimer = null;
+
 function showMessage(text, type = CONSTANTS.MESSAGE_TYPES.INFO) {
     const messageArea = document.getElementById('messageArea');
     const timestamp = new Date().toLocaleString('en-US', {
@@ -64,37 +66,94 @@ function showMessage(text, type = CONSTANTS.MESSAGE_TYPES.INFO) {
         minute: '2-digit',
         second: '2-digit'
     });
-
     messageArea.textContent = `[${timestamp}] ${text}`;
-
     messageArea.style.borderLeftColor =
         type === CONSTANTS.MESSAGE_TYPES.ERROR   ? '#dc3545' :
         type === CONSTANTS.MESSAGE_TYPES.SUCCESS  ? '#28a745' : '#667eea';
+
+    // Auto-dismiss error messages after 5 seconds
+    if (_errorDismissTimer) clearTimeout(_errorDismissTimer);
+    if (type === CONSTANTS.MESSAGE_TYPES.ERROR) {
+        _errorDismissTimer = setTimeout(() => {
+            messageArea.textContent = '';
+            _errorDismissTimer = null;
+        }, 5000);
+    }
+}
+
+function clearMessage() {
+    if (_errorDismissTimer) {
+        clearTimeout(_errorDismissTimer);
+        _errorDismissTimer = null;
+    }
+    const messageArea = document.getElementById('messageArea');
+    // Only clear if it's currently showing an error (red border)
+    if (messageArea.style.borderLeftColor === 'rgb(220, 53, 69)') {
+        messageArea.textContent = '';
+    }
 }
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
+/**
+ * Validates a MM/DD/YYYY date input on blur.
+ * Shows an error toast and clears the field if invalid.
+ */
+function validateDateInput(input) {
+    const value = input.value.trim();
+    if (!value) return; // Empty is allowed — required fields handled by form validation
+
+    const match = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!match) {
+        showMessage('Invalid date format — please use MM/DD/YYYY', CONSTANTS.MESSAGE_TYPES.ERROR);
+        input.value = '';
+        return;
+    }
+
+    const m = parseInt(match[1]);
+    const d = parseInt(match[2]);
+    const y = parseInt(match[3]);
+
+    if (m < 1 || m > 12) {
+        showMessage('Invalid month — must be between 01 and 12', CONSTANTS.MESSAGE_TYPES.ERROR);
+        input.value = '';
+        return;
+    }
+
+    const daysInMonth = new Date(y, m, 0).getDate();
+    if (d < 1 || d > daysInMonth) {
+        showMessage(`Invalid day — must be between 01 and ${daysInMonth} for the given month`, CONSTANTS.MESSAGE_TYPES.ERROR);
+        input.value = '';
+        return;
+    }
+
+    if (y < 1000 || y > 2100) {
+        showMessage('Invalid year — must be between 1000 and 2100', CONSTANTS.MESSAGE_TYPES.ERROR);
+        input.value = '';
+        return;
+    }
+}
+
 function dateFromStorage(storageDate) {
     if (!storageDate) return '';
     try {
-        // Handle DD-MMM-YYYY format (e.g., "15-Jan-2024")
+        // Handle DD-MMM-YYYY legacy format (e.g., "15-Jan-2024")
         if (storageDate.includes('-') && storageDate.split('-')[1].length === 3) {
-            const parts    = storageDate.split('-');
-            const day      = parseInt(parts[0]);
+            const parts     = storageDate.split('-');
+            const day       = parseInt(parts[0]);
             const monthAbbr = parts[1];
-            const year     = parseInt(parts[2]);
-            const months   = ['Jan','Feb','Mar','Apr','May','Jun',
+            const year      = parseInt(parts[2]);
+            const months    = ['Jan','Feb','Mar','Apr','May','Jun',
                                'Jul','Aug','Sep','Oct','Nov','Dec'];
-            const monthNum = months.indexOf(monthAbbr);
+            const monthNum  = months.indexOf(monthAbbr);
             if (monthNum !== -1) {
-                const date = new Date(year, monthNum, day);
-                return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+                return `${String(monthNum + 1).padStart(2,'0')}/${String(day).padStart(2,'0')}/${year}`;
             }
         }
-        // Fallback: ISO or other parseable format
-        const date = new Date(storageDate);
-        if (!isNaN(date.getTime())) {
-            return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+        // Handle YYYY-MM-DD format
+        if (/^\d{4}-\d{2}-\d{2}$/.test(storageDate)) {
+            const [year, month, day] = storageDate.split('-');
+            return `${month}/${day}/${year}`;
         }
         return '';
     } catch (e) {
@@ -102,10 +161,20 @@ function dateFromStorage(storageDate) {
     }
 }
 
-function dateToStorage(htmlDate) {
-    if (!htmlDate) return '';
-    // Input from <input type="date"> is already YYYY-MM-DD — store as-is
-    return htmlDate;
+function dateToStorage(userDate) {
+    if (!userDate) return '';
+    // Accept MM/DD/YYYY input and convert to YYYY-MM-DD for storage
+    const match = userDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (match) {
+        const [, month, day, year] = match;
+        // Basic range validation
+        const m = parseInt(month), d = parseInt(day), y = parseInt(year);
+        if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1000) return '';
+        return `${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    }
+    // Already YYYY-MM-DD (e.g. from import) — pass through
+    if (/^\d{4}-\d{2}-\d{2}$/.test(userDate)) return userDate;
+    return '';
 }
 
 // ── ID generation ─────────────────────────────────────────────────────────────
@@ -158,9 +227,13 @@ function getThemeColors() {
 async function loadSettings() {
     setTimeout(async () => {
         const pagesInput = document.getElementById('dailyReadingPages');
+        const folderInput = document.getElementById('backupFolder');
         if (pagesInput) {
             const settings = await loadSettingsFromDB() || {};
             pagesInput.value = settings.dailyReadingPages || '';
+            if (folderInput) {
+                folderInput.value = settings.backupFolder || '';
+            }
         }
     }, 50);
 }
@@ -169,10 +242,12 @@ async function saveSettings(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const dailyReadingPages = formData.get('dailyReadingPages');
+    const backupFolder = document.getElementById('backupFolder').value || null;
     const current = await loadSettingsFromDB() || {};
     await saveSettingsToDB({
         ...current,
-        dailyReadingPages: dailyReadingPages ? parseInt(dailyReadingPages) : null
+        dailyReadingPages: dailyReadingPages ? parseInt(dailyReadingPages) : null,
+        backupFolder: backupFolder
     });
     showMessage('Settings saved successfully', CONSTANTS.MESSAGE_TYPES.SUCCESS);
     showView('dashboard', document.querySelector('[onclick*="dashboard"]'));
@@ -180,5 +255,30 @@ async function saveSettings(event) {
 
 function resetSettings() {
     document.getElementById('dailyReadingPages').value = '';
+    document.getElementById('backupFolder').value = '';
     showMessage('Settings reset to defaults. Click Save to apply.', CONSTANTS.MESSAGE_TYPES.INFO);
+}
+
+async function selectBackupFolder() {
+    if (typeof window.__TAURI__ !== 'undefined') {
+        try {
+            const selected = await window.__TAURI_PLUGIN_DIALOG__.open({
+                directory: true,
+                multiple: false,
+                title: 'Select Backup Folder'
+            });
+            if (selected) {
+                document.getElementById('backupFolder').value = selected;
+            }
+        } catch (e) {
+            console.error('selectBackupFolder error:', e);
+            showMessage('Could not open folder picker: ' + (e.message || JSON.stringify(e)), CONSTANTS.MESSAGE_TYPES.ERROR);
+        }
+    } else {
+        showMessage('Folder picker is only available in the desktop app', CONSTANTS.MESSAGE_TYPES.INFO);
+    }
+}
+
+function clearBackupFolder() {
+    document.getElementById('backupFolder').value = '';
 }

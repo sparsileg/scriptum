@@ -62,8 +62,9 @@
             <h3>Quick Actions</h3>
             <div class="quick-actions">
               <button class="btn btn-secondary" onclick="showView('settings', this)">Settings</button>
-              <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Load Database</button>
-              <button class="btn btn-secondary" onclick="saveDatabaseFile()">Save Database</button>
+              <button class="btn btn-secondary"
+              onclick="document.getElementById('importFile').click()">Import All Data (JSON)</button>
+              <button class="btn btn-secondary" onclick="saveDatabaseFile()">Export All Data (JSON)</button>
               <button class="btn btn-secondary"
                       onclick="backupDatabaseFile()">Backup Database</button>
               <input type="file" id="importFile" class="file-input" accept=".json" onchange="importData()">
@@ -127,7 +128,7 @@
         <form id="bookForm" onsubmit="enterReadBook(event)">
           <div class="form-group">
             <label for="finished">Finished:</label>
-            <input type="date" id="finished" name="finished">
+            <input type="text" id="finished" name="finished" placeholder="MM/DD/YYYY" maxlength="10" onblur="validateDateInput(this)" oninput="clearMessage()">
           </div>
           <div class="form-group">
             <label for="title">Title:</label>
@@ -240,7 +241,7 @@
           <input type="hidden" id="editIndex" name="editIndex">
           <div class="form-group">
             <label for="editFinished">Finished:</label>
-            <input type="date" id="editFinished" name="finished">
+            <input type="text" id="editFinished" name="finished" placeholder="MM/DD/YYYY" maxlength="10" onblur="validateDateInput(this)" oninput="clearMessage()">
           </div>
           <div class="form-group">
             <label for="editTitle">Title:</label>
@@ -335,7 +336,15 @@
             <input type="number" id="dailyReadingPages" name="dailyReadingPages" min="1" max="1000"
                    placeholder="0" style="width: 8ch; max-width: 8ch;">
           </div>
-
+          <div class="form-group">
+            <label for="backupFolder">Backup Folder:</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" id="backupFolder" name="backupFolder" placeholder="No folder selected"
+                     style="flex: 1; min-width: 40ch;" readonly>
+              <button type="button" class="btn btn-secondary" onclick="selectBackupFolder()">Browse...</button>
+              <button type="button" class="btn btn-secondary" onclick="clearBackupFolder()">Clear</button>
+            </div>
+          </div>
           <div class="form-group">
             <label>Tag Management:</label>
             <button type="button" class="btn btn-secondary" onclick="showTagManagement()">Manage Tags</button>
@@ -613,7 +622,7 @@
             </div>
             <div class="form-group">
               <label for="myLibraryEditCheckedOutDate">Checked Out Date:</label>
-              <input type="date" id="myLibraryEditCheckedOutDate">
+              <input type="text" id="myLibraryEditCheckedOutDate" placeholder="MM/DD/YYYY" maxlength="10" onblur="validateDateInput(this)" oninput="clearMessage()">
             </div>
             <div style="margin-top: 20px;">
               <button type="submit" class="btn btn-primary">Save Changes</button>

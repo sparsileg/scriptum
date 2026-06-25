@@ -1,6 +1,7 @@
 // Global constants
 // Constants for magic strings
 const CONSTANTS = {
+    APP_NAME: 'scriptum',
     APP_VERSION: '0.7',
 
     DB: {

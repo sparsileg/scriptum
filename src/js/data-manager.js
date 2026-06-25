@@ -90,12 +90,12 @@ async function loadData() {
 }
 
 async function saveData() {
-    // saveData() is called after modifying the in-memory `books` array.
-    // We bulk-replace the entire store to keep it in sync.
-    await DBManager.clear(CONSTANTS.STORES.BOOKS_READ);
-    if (books.length > 0) {
-        await DBManager.putBulk(CONSTANTS.STORES.BOOKS_READ, books);
+    if (books.length === 0) {
+        console.warn('saveData() called with empty books array — skipping to prevent data loss');
+        return;
     }
+    await DBManager.clear(CONSTANTS.STORES.BOOKS_READ);
+    await DBManager.putBulk(CONSTANTS.STORES.BOOKS_READ, books);
 }
 
 async function saveBook(book) {
@@ -113,10 +113,12 @@ async function loadReadingListData() {
 }
 
 async function saveReadingListData() {
-    await DBManager.clear(CONSTANTS.STORES.READING_LIST);
-    if (readingList.length > 0) {
-        await DBManager.putBulk(CONSTANTS.STORES.READING_LIST, readingList);
+    if (readingList.length === 0) {
+        console.warn('saveReadingListData() called with empty readingList array — skipping to prevent data loss');
+        return;
     }
+    await DBManager.clear(CONSTANTS.STORES.READING_LIST);
+    await DBManager.putBulk(CONSTANTS.STORES.READING_LIST, readingList);
 }
 
 async function saveReadingListItem(item) {
@@ -138,10 +140,12 @@ async function loadMyLibraryData() {
 }
 
 async function saveMyLibraryData() {
-    await DBManager.clear(CONSTANTS.STORES.MY_LIBRARY);
-    if (myLibrary.length > 0) {
-        await DBManager.putBulk(CONSTANTS.STORES.MY_LIBRARY, myLibrary);
+    if (myLibrary.length === 0) {
+        console.warn('saveMyLibraryData() called with empty myLibrary array — skipping to prevent data loss');
+        return;
     }
+    await DBManager.clear(CONSTANTS.STORES.MY_LIBRARY);
+    await DBManager.putBulk(CONSTANTS.STORES.MY_LIBRARY, myLibrary);
 }
 
 async function saveMyLibraryBook(book) {
