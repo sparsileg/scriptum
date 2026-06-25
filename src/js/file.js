@@ -195,31 +195,3 @@ async function backupDatabaseFile() {
     URL.revokeObjectURL(url);
     showMessage(`Database backup saved as ${filename}`, CONSTANTS.MESSAGE_TYPES.SUCCESS);
 }
-
-async function importData() {
-    const file = document.getElementById('importFile').files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            const result = await importUnifiedDatabase(importedData);
-            if (result.success) {
-                showMessage(
-                    `Database loaded successfully. ${result.counts.booksRead} books read, ` +
-                    `${result.counts.readingList} in reading list, ` +
-                    `${result.counts.myLibrary} in library.`,
-                    CONSTANTS.MESSAGE_TYPES.SUCCESS
-                );
-                renderReadBooks();
-                renderDashboard();
-            } else {
-                showMessage('Import failed: ' + result.error, CONSTANTS.MESSAGE_TYPES.ERROR);
-            }
-        } catch (error) {
-            showMessage('Error parsing file: ' + error.message, CONSTANTS.MESSAGE_TYPES.ERROR);
-        }
-        document.getElementById('importFile').value = '';
-    };
-    reader.readAsText(file);
-}

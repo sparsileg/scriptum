@@ -152,8 +152,10 @@ pub fn save_books_read_bulk(state: State<ScriptumState>, books: Vec<BookRead>) -
 
 #[tauri::command]
 pub fn clear_books_read(state: State<ScriptumState>) -> Result<(), String> {
+    log::warn!("clear_books_read called — deleting all rows from books_read");
     let db = state.db.lock().map_err(|e| e.to_string())?;
     db.execute("DELETE FROM books_read", [])
         .map_err(|e| e.to_string())?;
+    log::warn!("clear_books_read complete");
     Ok(())
 }

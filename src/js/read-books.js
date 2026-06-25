@@ -17,27 +17,23 @@ const BOOK_CATEGORIES = [
     "Thriller", "Travel", "True Crime", "Young Adult"
 ];
 
-function generateCategoryOptions() {
-    const options = BOOK_CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`);
+async function generateCategoryOptions() {
+    const categories = await loadCategoriesFromDB();
+    const options = categories.map(cat => `<option value="${cat}">${cat}</option>`);
     return '<option value="">Select Category</option>' + options.join('');
 }
 
-function populateCategorySelects() {
-    const categoryOptions = generateCategoryOptions();
-
-    // Populate main form category select
+async function populateCategorySelects() {
+    const categoryOptions = await generateCategoryOptions();
     const categorySelect = document.getElementById('category');
     if (categorySelect) {
         categorySelect.innerHTML = categoryOptions;
     }
-
-    // Populate edit form category select
     const editCategorySelect = document.getElementById('editCategory');
     if (editCategorySelect) {
         editCategorySelect.innerHTML = categoryOptions;
     }
 }
-
 
 function enterReadBook(event) {
     event.preventDefault();
@@ -681,8 +677,9 @@ function updateFilterValue(operatorSelect) {
         break;
     case 'equals':
         if (field === 'Category') {
-            valueContainer.innerHTML =
-                `<select class="filter-value-input">${generateCategoryOptions()}</select>`;
+            generateCategoryOptions().then(opts => {
+                valueContainer.innerHTML = `<select class="filter-value-input">${opts}</select>`;
+            });
         } else if (field === 'Recommend') {
             valueContainer.innerHTML = `
                             <select class="filter-value-input">

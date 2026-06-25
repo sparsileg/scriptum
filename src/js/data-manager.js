@@ -90,8 +90,16 @@ async function loadData() {
 }
 
 async function saveData() {
+    // Safety check: never overwrite with fewer than 90% of what's currently in SQLite
+    const currentCount = await DBManager.getAll(CONSTANTS.STORES.BOOKS_READ).then(r => r.length).catch(() => 0);
+    if (currentCount > 10 && books.length < currentCount * 0.9) {
+        console.warn(`saveData() blocked — in-memory books (${books.length}) is less than 90% of SQLite count (${currentCount}). Possible data loss prevented.`);
+        console.trace();
+        return;
+    }
     if (books.length === 0) {
         console.warn('saveData() called with empty books array — skipping to prevent data loss');
+        console.trace();
         return;
     }
     await DBManager.clear(CONSTANTS.STORES.BOOKS_READ);
@@ -167,6 +175,24 @@ async function saveSettingsToDB(settingsObj) {
     await DBManager.put(CONSTANTS.STORES.SETTINGS, {
         id: 'app-settings',
         data: settingsObj
+    });
+}
+
+async function loadCategoriesFromDB() {
+    const settings = await loadSettingsFromDB() || {};
+    if (settings.categories && Array.isArray(settings.categories)) {
+        return settings.categories;
+    }
+    // First run — seed from BOOK_CATEGORIES and persist
+    await saveCategoriesToDB([...BOOK_CATEGORIES].sort());
+    return [...BOOK_CATEGORIES].sort();
+}
+
+async function saveCategoriesToDB(categoriesArray) {
+    const current = await loadSettingsFromDB() || {};
+    await saveSettingsToDB({
+        ...current,
+        categories: categoriesArray
     });
 }
 

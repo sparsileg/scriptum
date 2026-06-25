@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Tracker</title>
+    <title>Scriptum</title>
 
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/themes/nordic-dark.css" id="themeLink">
@@ -12,8 +12,8 @@
   <body>
     <div class="container">
       <div class="header">
-        <h1>📚 Book Tracker</h1>
-        <p>Keep track of your reading journey</p>
+        <h1>📚 Scriptum</h1>
+        <p>Track your reading journey</p>
       </div>
 
       <div class="nav-bar">
@@ -62,12 +62,9 @@
             <h3>Quick Actions</h3>
             <div class="quick-actions">
               <button class="btn btn-secondary" onclick="showView('settings', this)">Settings</button>
-              <button class="btn btn-secondary"
-              onclick="document.getElementById('importFile').click()">Import All Data (JSON)</button>
               <button class="btn btn-secondary" onclick="saveDatabaseFile()">Export All Data (JSON)</button>
-              <button class="btn btn-secondary"
-                      onclick="backupDatabaseFile()">Backup Database</button>
-              <input type="file" id="importFile" class="file-input" accept=".json" onchange="importData()">
+              <button class="btn btn-secondary" onclick="backupDatabaseFile()">Backup Database</button>
+              <button class="btn btn-secondary" onclick="showRestoreScreen1()">Restore from Backup</button>
             </div>
           </div>
 
@@ -346,8 +343,8 @@
             </div>
           </div>
           <div class="form-group">
-            <label>Tag Management:</label>
             <button type="button" class="btn btn-secondary" onclick="showTagManagement()">Manage Tags</button>
+            <button type="button" class="btn btn-secondary" onclick="showCategoryManagement()" style="margin-left: 10px;">Manage Categories</button>
           </div>
 
           <div style="padding-bottom: 20px;">
@@ -667,6 +664,96 @@
         </div>
       </div> <!-- end of Tag Management -->
 
+      <!-- Category Management Modal -->
+      <div id="categoryManagementModal" class="modal">
+        <div class="modal-content">
+          <h3>Category Management</h3>
+          <div id="categoriesList" class="tags-list">
+            <!-- Categories will be populated here -->
+          </div>
+          <div id="categoryDeleteBooksList" style="display: none;">
+            <!-- Books using a category to be deleted will appear here -->
+          </div>
+          <div class="form-group" style="margin-top: 15px; display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 1.2em;">+</span>
+            <label for="newCategoryInput">Add Category:</label>
+            <input type="text" id="newCategoryInput" placeholder="New category name" style="flex: 1;">
+            <button type="button" class="btn btn-primary" onclick="addCategory()">Add</button>
+          </div>
+          <div style="margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeCategoryManagement()">Close</button>
+          </div>
+        </div>
+      </div> <!-- end of Category Management -->
+
+      <!-- Restore Screen 1 — Select File -->
+      <div id="restoreScreen1Modal" class="modal">
+        <div class="modal-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Select Backup File</h3>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" onclick="closeRestore()">Close</button>
+              <button class="btn btn-primary" id="restoreContinueBtn" onclick="restoreContinue()" disabled>Continue</button>
+            </div>
+          </div>
+          <div style="text-align: center; padding: 30px 0;">
+            <p>Select a backup file to restore:</p>
+            <button class="btn btn-primary" onclick="restoreBrowseFiles()" style="margin: 15px 0;">Browse Files</button>
+            <input type="file" id="restoreFileInput" class="file-input" accept=".json,.json.gz,.gz" onchange="restoreFileSelected()">
+            <div id="restoreFileInfo" style="margin-top: 10px; color: var(--color-accent);"></div>
+          </div>
+        </div>
+      </div> <!-- end of Restore Screen 1 -->
+
+      <!-- Restore Screen 2 — Confirm Restore -->
+      <div id="restoreScreen2Modal" class="modal">
+        <div class="modal-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Restore Backup?</h3>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" onclick="closeRestore()">Close</button>
+              <button class="btn btn-primary" id="restoreConfirmBtn" onclick="executeRestore()" disabled>Restore</button>
+            </div>
+          </div>
+
+          <!-- File metadata -->
+          <div id="restoreMetadata" style="background: var(--color-surface); border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+          </div>
+
+          <!-- Data counts -->
+          <div id="restoreCounts" style="margin-bottom: 15px;">
+          </div>
+
+          <!-- Error display -->
+          <div id="restoreError" style="display: none; background: #dc354522; border: 1px solid #dc3545;
+               border-radius: 6px; padding: 15px; margin-bottom: 15px; color: #dc3545;">
+          </div>
+
+          <!-- Warning -->
+          <div id="restoreWarning" style="display: none; background: #ff990022; border: 1px solid #ff9900;
+               border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+            <p style="margin: 0 0 8px;"><strong>⚠️ IMPORTANT: This will permanently delete your current data</strong></p>
+            <p style="margin: 0 0 8px;"><strong>Backup your current data first!</strong> This restore operation will:</p>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Delete all current data stores</li>
+              <li>Replace them with backup file contents</li>
+              <li>This action cannot be undone</li>
+            </ul>
+          </div>
+
+          <!-- Confirmation checkbox -->
+          <div id="restoreCheckboxRow" style="display: none; background: var(--color-surface);
+               border-radius: 6px; padding: 15px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="restoreConfirmCheckbox" onchange="restoreCheckboxChanged()"
+                     style="margin-top: 3px; flex-shrink: 0;">
+              <span>I have backed up my current data and understand this will permanently replace all data stores</span>
+            </label>
+          </div>
+
+        </div>
+      </div> <!-- end of Restore Screen 2 -->
+
 
     </div> <!-- end of Container -->
 
@@ -683,9 +770,11 @@
     <script src="js/isbn.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/read-books.js"></script>
+    <script src="js/restore.js"></script>
     <script src="js/statistics.js"></script>
     <script src="js/reading-list.js"></script>
     <script src="js/my-library.js"></script>
+    <script src="js/category-management.js"></script>
     <script src="js/tags.js"></script>
 
   </body>

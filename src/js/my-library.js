@@ -34,12 +34,10 @@ function populateMyLibraryBookshelfSelects() {
 
 
 // Populate category selects
-function populateMyLibraryCategorySelects() {
-    const categoryOptions = generateCategoryOptions();
-
+async function populateMyLibraryCategorySelects() {
+    const categoryOptions = await generateCategoryOptions();
     const addSelect = document.getElementById('myLibraryAddCategory');
     const editSelect = document.getElementById('myLibraryEditCategory');
-
     if (addSelect) addSelect.innerHTML = categoryOptions;
     if (editSelect) editSelect.innerHTML = categoryOptions;
 }
@@ -702,7 +700,9 @@ function updateMyLibraryFilterValue(operatorSelect) {
         break;
     case 'equals':
         if (field === 'Category') {
-            valueContainer.innerHTML = `<select class="filter-value-input">${generateCategoryOptions()}</select>`;
+            generateCategoryOptions().then(opts => {
+                valueContainer.innerHTML = `<select class="filter-value-input">${opts}</select>`;
+            });
         } else if (field === 'CheckedOut') {
             valueContainer.innerHTML = `
                 <select class="filter-value-input">
@@ -1026,14 +1026,11 @@ function clearAllMyLibraryBooks() {
 let selectedImportCategory = null;
 
 // Start the CSV import process with category selection
-function startMyLibraryCSVImport() {
-    // Populate the category dropdown
+async function startMyLibraryCSVImport() {
     const categorySelect = document.getElementById('myLibraryImportCategory');
     if (categorySelect) {
-        categorySelect.innerHTML = generateCategoryOptions();
+        categorySelect.innerHTML = await generateCategoryOptions();
     }
-
-    // Show the category selection modal
     document.getElementById('myLibraryCategorySelectModal').style.display = 'block';
 }
 

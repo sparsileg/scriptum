@@ -352,6 +352,14 @@ body::before {
     100% { transform: scale(1); }
 }
 
+.btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    text-shadow: none;
+}
+
 .btn-small {
     padding: 4px 8px;
     font-size: 0.8em;
