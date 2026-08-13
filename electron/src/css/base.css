@@ -1,0 +1,1099 @@
+/*
+  Scriptum Base CSS
+  Contains all structural and layout definitions
+  Theme-specific colors are in css/themes/
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Inter', sans-serif;
+    font-weight: 400;
+    background: var(--bg-primary);
+    min-height: 100vh;
+    color: var(--text-primary);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2em;
+    color: var(--text-primary);
+}
+
+.header h1 {
+    font-size: 2.0rem;
+    margin-bottom: 10px;
+    font-weight: 400;
+    text-shadow: none;
+    color: var(--accent-primary);
+}
+
+.header p {
+    font-weight: 400;
+    opacity: 0.8;
+    color: var(--accent-secondary);
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1px;
+    margin-bottom: 1em;
+}
+
+.nav-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    cursor: pointer;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    color: var(--text-secondary);
+    border-right: none;
+    font-size: 0.8em;
+}
+
+.nav-btn:last-child {
+    border-right: 1px solid var(--border-color);
+}
+
+.nav-btn:hover {
+    background: var(--accent-secondary);
+    color: var(--text-hover);
+    border-color: var(--accent-secondary);
+}
+
+.nav-btn.active {
+    background: var(--accent-primary);
+    color: var(--text-active);
+    border-color: var(--accent-primary);
+}
+
+.theme-selector {
+    margin-top: 1.8em;
+}
+
+.theme-selector select {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    font-size: 0.8em;
+    font-weight: 400;
+    min-width: 140px;
+    border-radius: 0;
+}
+
+.theme-selector select:hover {
+    background: var(--accent-secondary);
+    color: var(--text-hover);
+    border-color: var(--accent-secondary);
+}
+
+.message-area {
+    background: var(--bg-message);
+    color: var(--text-success);
+    border-radius: 0;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+    min-height: 1.4em;
+    border: 1px solid var(--border-color);
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.8em;
+}
+
+.view {
+    display: none;
+    background: var(--bg-tertiary);
+    border-radius: 0;
+    padding: 0px 40px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.view.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 7em;
+    flex-shrink: 0;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    flex: 1;
+    padding: 6px 4px;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
+    font-size: 0.85em;
+    transition: border-color 0.3s ease;
+    background: transparent;
+    color: var(--text-primary);
+    font-weight: 400;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-bottom-color: var(--accent-primary);
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 0;
+}
+
+.form-group textarea:focus {
+    border-color: var(--accent-primary);
+}
+
+.form-group category {
+    font-size: 0.8em;
+}
+
+.form-row {
+    display: flex;
+    gap: 1.0em;
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 2.0em;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: 1px solid var(--accent-secondary);
+    border-radius: 0;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    background: transparent;
+    color: var(--accent-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75em;
+}
+
+.btn:hover {
+    background: var(--accent-secondary);
+    color: var(--text-hover);
+}
+
+.btn-primary {
+    background: transparent;
+    color: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+}
+
+.btn-primary:hover {
+    background: var(--accent-primary);
+    color: var(--text-active);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--accent-secondary);
+    border: 1px solid var(--accent-secondary);
+}
+
+.btn-secondary:hover {
+    background: var(--accent-secondary);
+    color: var(--text-active);
+}
+
+.btn-danger {
+    background: var(--color-danger);
+    color: #ffffff;
+    border: 1px solid var(--color-danger);
+}
+
+.btn-danger:hover {
+    background: var(--color-danger-hover);
+    border-color: var(--color-danger-hover);
+}
+
+.btn-confirm {
+    animation: confirmPulse 0.6s ease-in-out;
+}
+
+@keyframes confirmPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.file-input {
+    display: none;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 10px;
+    border-radius: 0;
+}
+
+/* Ensure both My Library header and data tables have identical column widths */
+#myLibraryHeaderTable,
+#myLibraryTable {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#myLibraryHeaderTable th:nth-child(1),
+#myLibraryTable th:nth-child(1) { width: 18em; }
+#myLibraryHeaderTable th:nth-child(2),
+#myLibraryTable th:nth-child(2) { width: 15em; }
+#myLibraryHeaderTable th:nth-child(3),
+#myLibraryTable th:nth-child(3) { width: 11em; }
+#myLibraryHeaderTable th:nth-child(4),
+#myLibraryTable th:nth-child(4) { width: 10em; }
+#myLibraryHeaderTable th:nth-child(5),
+#myLibraryTable th:nth-child(5) { width: 13em; }
+
+/* Also apply to td elements for data alignment */
+#myLibraryTable td:nth-child(1) { width: 18em; }
+#myLibraryTable td:nth-child(2) { width: 15em; }
+#myLibraryTable td:nth-child(3) { width: 11em; }
+#myLibraryTable td:nth-child(4) { width: 10em; }
+#myLibraryTable td:nth-child(5) { width: 13em; }
+
+/* Ensure both header and data tables have identical column widths */
+#booksHeaderTable,
+#booksTable {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#booksHeaderTable th:nth-child(1),
+#booksTable th:nth-child(1) { width: 10em; }
+#booksHeaderTable th:nth-child(2),
+#booksTable th:nth-child(2) { width: 13.5em; }
+#booksHeaderTable th:nth-child(3),
+#booksTable th:nth-child(3) { width: 14em; }
+#booksHeaderTable th:nth-child(4),
+#booksTable th:nth-child(4) { width: 5em; }
+#booksHeaderTable th:nth-child(5),
+#booksTable th:nth-child(5) { width: 12em; }
+#booksHeaderTable th:nth-child(6),
+#booksTable th:nth-child(6) { width: 9em; }
+
+/* Also apply to td elements for data alignment */
+#booksTable td:nth-child(1) { width: 10em; }
+#booksTable td:nth-child(2) { width: 15em; }
+#booksTable td:nth-child(3) { width: 15em; }
+#booksTable td:nth-child(4) { width: 5em; }
+#booksTable td:nth-child(5) { width: 12em; }
+#booksTable td:nth-child(6) { width: 8em; }
+
+.data-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: var(--bg-message);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    position: relative;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+    font-size: 0.75em;
+}
+
+.data-table th:hover {
+    background: var(--accent-secondary);
+}
+
+.data-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-size: 0.8em;
+}
+
+.data-table tr:hover {
+    background: var(--bg-secondary);
+    cursor: pointer;
+}
+
+#comments, #editComments {
+    font-size: 1.0em;
+}
+
+#finished, #editFinished {
+    font-size: 1.0em;
+    padding: 8px 0;
+    max-width: 10em;
+}
+
+/* Dark theme calendar styling */
+#finished::-webkit-calendar-picker-indicator,
+#editFinished::-webkit-calendar-picker-indicator {
+    filter: var(--calendar-icon-filter);
+    cursor: pointer;
+}
+
+#pages, #category, #recommend, 
+#editPages, #editCategory, #editRecommend {
+    max-width: 10em;
+}
+
+.filter-panel {
+    background: var(--bg-secondary);
+    border-radius: 0;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.filter-panel h3 {
+    font-weight: 500;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.95em;
+    color: var(--accent-primary);
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.filter-field, .filter-operator, .filter-value-input, .filter-value select.filter-value-input {
+    font-size: 1.0em;
+}
+
+.filter-field {
+    min-width: 10em;
+}
+
+.filter-operator {
+    min-width: 8em;
+}
+
+.filter-value {
+    flex: 1;
+}
+
+.filter-value-input {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
+    padding: 12px 0 !important;
+}
+
+.filter-value-input:focus {
+    border-bottom-color: var(--accent-primary) !important;
+}
+
+.sort-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    z-index: 1000;
+    min-width: 180px;
+}
+
+.sort-option {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-size: 0.85em;
+}
+
+.sort-option:hover {
+    background: var(--accent-secondary);
+    color: var(--text-hover);
+}
+
+.search-icon {
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 0;
+    transition: all 0.2s;
+    color: var(--accent-secondary);
+    margin-left: 8px;
+    font-size: 0.9em;
+}
+
+.search-icon:hover {
+    background: var(--bg-secondary);
+    color: var(--accent-primary);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--modal-backdrop);
+}
+
+.modal-content {
+    background-color: var(--bg-tertiary);
+    margin: 5% auto;
+    padding: 25px;
+    border: 1px solid var(--border-color);
+    width: 60%;
+    max-width: 800px;
+    border-radius: 0;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--accent-primary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 1.1em;
+}
+
+.close {
+    color: var(--text-secondary);
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close:hover,
+.close:focus {
+    color: var(--color-danger);
+}
+
+.isbn-lookup-info {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 12px;
+    margin: 12px 0;
+}
+
+.isbn-lookup-info h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--accent-primary);
+    font-size: 0.9em;
+}
+
+.isbn-lookup-info p {
+    margin: 4px 0;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+}
+
+.confidence-bar {
+    height: 6px;
+    background: var(--bg-primary);
+    border-radius: 0;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: var(--color-success);
+    transition: width 0.3s ease;
+}
+
+.select-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: flex-end;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.dashboard-card {
+    background: var(--bg-tertiary);
+    border-radius: 0;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.dashboard-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--accent-primary);
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.8em;
+}
+
+.stat-value {
+    color: var(--accent-primary);
+    font-weight: 500;
+    font-size: 0.8em;
+}
+
+.recent-books-list {
+/*
+    max-height: 200px;
+    overflow-y: auto;
+*/
+}
+
+.recent-book-item {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9em;
+}
+
+.recent-book-title {
+    color: var(--text-primary);
+    font-weight: 500;
+    display: inline;
+}
+
+.recent-book-author {
+    color: var(--accent-secondary);
+    font-weight: 400;
+    display: inline;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quick-actions .btn {
+    width: 100%;
+    margin-right: 0;
+    justify-self: stretch;
+}
+
+.goal-placeholder {
+    text-align: center;
+    padding: 15px 0;
+    color: var(--accent-secondary);
+}
+
+.goal-placeholder p {
+    margin-bottom: 12px;
+    font-size: 0.8em;
+}
+
+.placeholder-content {
+    text-align: center;
+    padding: 30px 15px;
+    color: var(--accent-secondary);
+}
+
+.placeholder-content p {
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.theme-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.btn-theme {
+    flex: 1;
+    padding: 6px 4px;
+    font-size: 0.75em;
+    border: 1px solid;
+    margin-right: 0;
+}
+
+.btn-theme[onclick*="dark"] {
+    background: #2e3440;
+    color: #88c0d0;
+    border-color: #88c0d0;
+}
+
+.btn-theme[onclick*="light"] {
+    background: #eceff4;
+    color: #5e81ac;
+    border-color: #5e81ac;
+}
+
+.btn-theme[onclick*="matrix"] {
+    background: #000000;
+    color: #00ff00;
+    border-color: #00ff00;
+}
+
+.goal-current {
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: inherit;
+    font-size: 0.85em;
+}
+
+.reading-progress-chart {
+    height: 180px;
+}
+
+#readingGoalChart {
+    max-height: 180px;
+}
+
+.sort-indicator {
+    font-size: 0.7em;
+    margin-left: 4px;
+    color: inherit;
+}
+
+.sort-indicator.active {
+    opacity: 1;
+}
+
+.sort-indicator .sort-up,
+.sort-indicator .sort-down {
+    display: inline-block;
+    line-height: 0.5;
+}
+
+.sort-indicator .sort-up {
+    margin-right: 1px;
+}
+
+
+.reading-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.add-book-section {
+    background: var(--bg-secondary);
+    border-radius: 0;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.reading-list-display {
+    flex: 1;
+}
+
+.reading-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reading-list-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.book-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.book-rank {
+    font-weight: 500;
+    color: var(--accent-primary);
+    min-width: 50px;
+    text-align: center;
+    font-size: 0.8em;
+}
+
+.book-details {
+    flex: 1;
+}
+
+.book-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    font-size: 0.85em;
+}
+
+.book-author {
+    color: var(--accent-secondary);
+    font-size: 0.75em;
+    margin-bottom: 2px;
+}
+
+.book-source {
+    color: var(--border-color);
+    font-size: 0.7em;
+}
+
+.book-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 0.7em;
+    min-width: auto;
+}
+
+.whats-next-list {
+    /* max-height: 200px; */
+    /* overflow-y: auto; */
+}
+
+.whats-next-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9em;
+}
+
+.whats-next-item:last-child {
+    border-bottom: none;
+}
+
+.whats-next-rank {
+    font-weight: 500;
+    color: var(--accent-primary);
+    min-width: 50px;
+    text-align: center;
+    font-size: 0.8em;
+}
+
+.whats-next-details {
+    flex: 1;
+}
+
+.whats-next-title {
+    color: var(--text-primary);
+    font-weight: 500;
+    display: inline;
+}
+
+.whats-next-author {
+    color: var(--accent-secondary);
+    font-weight: 400;
+    display: inline;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: var(--accent-secondary);
+    font-weight: bold;
+    padding: 0 4px;
+    user-select: none;
+    font-size: 0.9em;
+}
+
+.drag-handle:hover {
+    color: var(--accent-primary);
+}
+
+.reading-list-item[draggable="true"]:hover {
+    background: var(--bg-message);
+}
+
+.reading-list-item.drag-over {
+    border-top: 2px solid var(--accent-primary);
+    background: var(--bg-message);
+}
+
+.reading-list-item:active .drag-handle {
+    cursor: grabbing;
+}
+
+.my-library-fixed-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-tertiary);
+    z-index: 100;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
+}
+
+.my-library-table-header {
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.my-library-table-header table {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.my-library-scrollable-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-top: none;
+}
+
+.my-library-scrollable-content table {
+    margin-top: 0;
+    border-top: none;
+}
+
+.my-library-scrollable-content table thead {
+    display: none;
+}
+
+.books-read-fixed-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-tertiary);
+    z-index: 100;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
+}
+
+.books-read-table-header {
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.books-read-table-header table {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.books-read-scrollable-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-top: none;
+}
+
+.books-read-scrollable-content table {
+    margin-top: 0;
+    border-top: none;
+}
+
+.books-read-scrollable-content table thead {
+    display: none;
+}
+
+.reading-list-item.checked-out-item {
+    background: var(--bg-message);
+    border-left: 3px solid var(--accent-primary);
+}
+
+.reading-list-item.checked-out-item .book-title {
+    color: var(--accent-primary);
+    font-weight: 600;
+}
+
+.reading-list-item.checked-out-item .book-source {
+    color: var(--accent-primary);
+    font-weight: 500;
+}
+
+
+.form-buttons {
+    margin-top: 15px;
+    padding-bottom: 8px;
+}
+
+
+.btn-header {
+    padding: 3px 6px !important;
+    font-size: 0.65em !important;
+    vertical-align: middle;
+}
+
+
+.dashboard-card-draggable {
+    cursor: move;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card-dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    z-index: 1000;
+}
+
+.dashboard-card-drag-over {
+    border: 2px dashed var(--accent-primary);
+    background: var(--bg-drag-over);
+}
+
+
+.tags-list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.tag-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    border-bottom: 1px solid;
+    border-color: inherit;
+}
+
+.tag-item:last-child {
+    border-bottom: none;
+}
+
+.tag-name {
+    font-weight: 500;
+    flex: 1;
+    font-size: 0.85em;
+}
+
+.tag-count {
+    margin-left: 8px;
+    opacity: 0.7;
+    font-size: 0.75em;
+}
+
+.tag-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: 12px;
+}
+
+/* Export dropdown styling */
+.export-dropdown {
+    display: inline-block;
+    position: relative;
+    margin-left: 10px;
+}
+
+.export-btn {
+    background: transparent;
+    color: var(--accent-secondary);
+    border: 1px solid var(--accent-secondary);
+    padding: 2px 5px;
+    font-size: 0.55em;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 0;
+    vertical-align: middle;
+}
+
+.export-btn:hover {
+    background: var(--accent-secondary);
+    color: var(--text-hover);
+}
+
+.export-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--bg-secondary);
+    min-width: 160px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    z-index: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+}
+
+.export-dropdown-content a {
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.65em;
+    transition: background 0.2s;
+}
+
+.export-dropdown-content a:hover {
+    background-color: var(--accent-secondary);
+    color: var(--text-hover);
+}
+
+.export-dropdown-content.show {
+    display: block;
+}
+
+/* Fix buttons inside page headers */
+.my-library-fixed-header h2 .btn,
+.books-read-fixed-header h2 .btn,
+h2 .btn-header {
+    font-size: 0.55em !important;
+    padding: 2px 5px !important;
+    letter-spacing: 0.3px !important;
+}
