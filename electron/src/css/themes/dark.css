@@ -1,0 +1,38 @@
+/*
+  Scriptum Dark Theme
+  Nordic-inspired color palette
+ */
+
+:root {
+    /* Backgrounds */
+    --bg-primary: #1e2124;
+    --bg-secondary: #3b4252;
+    --bg-tertiary: #2e3440;
+    --bg-message: #434c5e;
+    --bg-drag-over: rgba(136, 192, 208, 0.1);
+    
+    /* Text colors */
+    --text-primary: #e5e9f0;
+    --text-secondary: #d8dee9;
+    --text-hover: #eceff4;
+    --text-active: #2e3440;
+    
+    /* Accent colors */
+    --accent-primary: #88c0d0;
+    --accent-secondary: #5e81ac;
+    
+    /* Border and shadows */
+    --border-color: #4c566a;
+    --shadow-color: rgba(0,0,0,0.3);
+    
+    /* Status colors */
+    --color-success: #a3be8c;
+    --color-danger: #dc3545;
+    --color-danger-hover: #c82333;
+    
+    /* Modal */
+    --modal-backdrop: rgba(0, 0, 0, 0.6);
+    
+    /* Calendar icon filter */
+    --calendar-icon-filter: invert(1);
+}

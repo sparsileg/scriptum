@@ -1,0 +1,56 @@
+/*
+  Scriptum Matrix Theme
+  Matrix code-inspired green-on-black
+ */
+
+:root {
+    /* Backgrounds */
+    --bg-primary: #000000;
+    --bg-secondary: #001100;
+    --bg-tertiary: #000000;
+    --bg-message: rgba(0, 50, 0, 0.8);
+    --bg-drag-over: rgba(0, 255, 0, 0.1);
+    
+    /* Text colors */
+    --text-primary: #00ff00;
+    --text-secondary: #00cc00;
+    --text-hover: #00ff00;
+    --text-active: #000000;
+    
+    /* Accent colors */
+    --accent-primary: #00ff00;
+    --accent-secondary: #00cc00;
+    
+    /* Border and shadows */
+    --border-color: #003300;
+    --shadow-color: rgba(0, 255, 0, 0.2);
+    
+    /* Status colors */
+    --color-success: #00ff00;
+    --color-danger: #ff0000;
+    --color-danger-hover: #cc0000;
+    
+    /* Modal */
+    --modal-backdrop: rgba(0, 0, 0, 0.8);
+    
+    /* Calendar icon filter */
+    --calendar-icon-filter: invert(1) hue-rotate(80deg);
+}
+
+/* Matrix theme-specific visual enhancements */
+.header h1 {
+    text-shadow: 0 0 10px #00ff00;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.message-area {
+    text-shadow: 0 0 3px #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.dashboard-card {
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+}
