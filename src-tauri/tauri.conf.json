@@ -18,7 +18,8 @@
             }
         ],
         "security": {
-            "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://openlibrary.org https://www.googleapis.com"
+            "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https://openlibrary.org https://www.googleapis.com",
+            "dangerousDisableAssetCspModification": ["script-src"]
         }
     },
     "bundle": {
